@@ -1,0 +1,30 @@
+* To-Do List CLI
+
+todo-cli is a Simple^{tm} and, more notably, /Rusty/ to-do list application served as a CLI backed with persistent memory.
+
+** Why Rust?
+
+[[https://rust-lang.org/][Rust]] is a systems-level programming langauge that values runtime safety, performance, and ergonomics. The language had its first stable release in March, 2020, and has since been used by companies like Mozilla, Facebook, and Dropbox for systems-level project where software performance and developer productivity are both equally-pressing concerns.
+
+Rust is most famously known for the following:
+
+- Memory/resource safety known at compile-time (can still get logic errors)
+- Expressive type system modeled after those of languages like Haskell and OCaml
+- Absence of bloat in the runtime and compiler optimizations that result in (anecdotally) very performant binaries
+
+We use Rust for this project, together with the CLI parser [[https://docs.rs/clap/2.33.0/clap][clap-rs]] and the serialization framework [[https:docs.rs/clap/2.33.0/clap/][serde-rs]].
+
+** Installation and Usage
+
+To get set up with the Rust toolchain, see the [[https:www.rust-lang.org/learn/get-started][Getting Started page]] provided on the official website.
+
+This tutorial assumes that the user is setup with Cargo, Rustup, and an IDE/editor of his/her choice. Please refer to the Rust website or contact the maintainer(s) if any more clarification is necessary.
+
+** Tutorial Format
+
+This will be a three-week online tutorial where, in each week, we produce some usable and testable component of software.
+
+*Week 1*: Setting up the CLI with clap and representing the application state with Rust's data structures\\
+*Week 2*: Serializing and deserializing application state to disk\\
+*Week 3*: Converting our to-do list UI to function as a REPL\\
+

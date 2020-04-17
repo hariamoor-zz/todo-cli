@@ -2,12 +2,15 @@ pub mod api {
     use serde::{Deserialize, Serialize};
     use std::fmt::Debug;
 
+    // You do not need this in week 1.
     #[derive(Serialize, Deserialize, Debug, Clone)]
     pub struct ToDoList<T> {
         pub items: Vec<T>,
         pub name: String,
     }
 
+    // Week 1: you do not need the "#[derive..." line.
+    // It will be explained in the later weeks.
     #[derive(Debug)]
     pub enum Instruction {
         Add(String),
@@ -20,7 +23,6 @@ pub mod api {
 pub mod cli {
     use super::api::*;
 
-    // use clap::{load_yaml, App};
     use clap::clap_app;
 
     pub fn parse() -> Option<Instruction> {
@@ -48,11 +50,17 @@ pub mod cli {
         if let Some(matches) = matches.subcommand_matches("add") {
             return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
         } else if let Some(matches) = matches.subcommand_matches("rm") {
-            return Some(Instruction::Remove(
-                matches.value_of("NUM")?.parse().unwrap(),
-            ));
+	    // Why can't we use `?` after the parse?
+            return if let Ok(n) = matches.value_of("NUM")?.parse() {
+		Some(Instruction::Remove(n));
+	    } else {
+		None
+	    }
         } else if let Some(matches) = matches.subcommand_matches("modify") {
             return Some(Instruction::Modify(
+		// Exercise (week 1): this is unsafe since if the user tries to, persay,
+		// $ ./todo-cli modify dog --new "feed the dog"
+		// the code will panic. How might you fix this?
                 matches.value_of("NUM")?.parse().unwrap(),
                 matches.value_of("NEW")?.to_string(),
             ));
@@ -66,4 +74,5 @@ pub mod cli {
 
 fn main() {
     // TODO: Build persistence layer
+    println!(cli::parse())
 }

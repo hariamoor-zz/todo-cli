@@ -1,69 +1,30 @@
-pub mod api {
-    use serde::{Deserialize, Serialize};
-    use std::fmt::Debug;
+use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct ToDoList<T> {
-        pub items: Vec<T>,
-        pub name: String,
-    }
+mod api;
+mod cli;
 
-    #[derive(Debug)]
-    pub enum Instruction {
-        Add(String),
-        Remove(usize),
-        Modify(usize, String),
-        Print,
-    }
-}
+use crate::api::api::ToDoList;
+use crate::cli::cli::parse;
 
-pub mod cli {
-    use super::api::*;
-
-    // use clap::{load_yaml, App};
-    use clap::clap_app;
-
-    pub fn parse() -> Option<Instruction> {
-        let matches = clap_app!(todo_cli =>
-            (version: "0.1")
-            (author: "USACS at Rutgers University <usacs.rutgers.edu>")
-            (about: "Simple to-do list CLI in Rust")
-            (@arg print: -p --print "Print out all valued stored in CLI")
-            (@subcommand add =>
-                (@arg NEW: +required +takes_value "Task to add")
-                (about: "Add a task to CLI")
-            )
-            (@subcommand rm =>
-                (@arg NUM: +required +takes_value "Identifier of task to remove")
-                (about: "Remove a task from CLI")
-            )
-            (@subcommand modify =>
-                (@arg NUM: +required +takes_value "Identifier of task to modify")
-                (@arg NEW: -n --new +required +takes_value "Task number to modify")
-                (about: "Modify a task stored by the CLI")
-            )
-        )
-        .get_matches();
-
-        if let Some(matches) = matches.subcommand_matches("add") {
-            return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
-        } else if let Some(matches) = matches.subcommand_matches("rm") {
-            return Some(Instruction::Remove(
-                matches.value_of("NUM")?.parse().unwrap(),
-            ));
-        } else if let Some(matches) = matches.subcommand_matches("modify") {
-            return Some(Instruction::Modify(
-                matches.value_of("NUM")?.parse().unwrap(),
-                matches.value_of("NEW")?.to_string(),
-            ));
-        } else if let Some(_) = matches.value_of("print") {
-            return Some(Instruction::Print);
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut list: ToDoList<String> = match File::open(api::api::BACKUP_FILE) {
+        Ok(file) => {
+            // file exists - deserialize and go with existing list
+            let file = BufReader::new(file);
+            serde_json::from_reader(file)?
         }
+        Err(_) => {
+            // file does not exist - make a new list
+            ToDoList::new(env!("USER").to_string())
+        }
+    };
 
-        return None;
+    match parse() {
+        Some(inst) => list.run(inst),
+        None => panic!("Arguments could not be parsed"),
     }
-}
 
-fn main() {
-    // TODO: Build persistence layer
+    Ok(())
 }

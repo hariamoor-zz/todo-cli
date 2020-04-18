@@ -7,7 +7,9 @@ pub mod cli {
             (version: "0.1")
             (author: "USACS at Rutgers University <usacs.rutgers.edu>")
             (about: "Simple to-do list CLI in Rust")
-            (@arg print: -p --print "Print out all valued stored in CLI")
+            (@subcommand print =>
+                (about: "Print out all values stored in CLI")
+            )
             (@subcommand add =>
                 (@arg NEW: +required +takes_value "Task to add")
                 (about: "Add a task to CLI")

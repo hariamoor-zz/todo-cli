@@ -25,6 +25,5 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(inst) => list.run(inst),
         None => panic!("Arguments could not be parsed"),
     }
-
     Ok(())
 }

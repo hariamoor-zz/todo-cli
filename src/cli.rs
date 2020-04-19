@@ -29,11 +29,16 @@ pub mod cli {
         if let Some(matches) = matches.subcommand_matches("add") {
             return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
         } else if let Some(matches) = matches.subcommand_matches("rm") {
-            return Some(Instruction::Remove(
-                matches.value_of("NUM")?.parse().unwrap(),
-            ));
+	    // Why can't we use a `?` after the parse?
+            return if let Ok(idx) = matches.value_of("NUM")?.parse() {
+		Some(Instruction::Remove(idx))
+            } else {
+		None
+	    }
         } else if let Some(matches) = matches.subcommand_matches("modify") {
             return Some(Instruction::Modify(
+		// This code might panic. Why? Exercise(Week 1): gracefully handle
+		// the error case.
                 matches.value_of("NUM")?.parse().unwrap(),
                 matches.value_of("NEW")?.to_string(),
             ));

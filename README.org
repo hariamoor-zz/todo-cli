@@ -1,6 +1,8 @@
-* To-Do List CLI
+* Building a Rusty To-Do List CLI
 
-todo-cli is a Simple^{tm} and, more notably, /Rusty/ to-do list application served as a CLI backed with persistent memory.
+In this 3-week online programming tutorial, we will be building a to-do list management CLI in Rust. Each weekly lesson is served as a programming guide (see Wiki).
+
+UPDATE: [[https://github.com/hariamoor/todo-cli/wiki/Week-1][Week 1 now available.]]
 
 ** Why Rust?
 
@@ -12,11 +14,11 @@ Rust is most famously known for the following:
 - Expressive type system modeled after those of languages like Haskell and OCaml
 - Absence of bloat in the runtime and compiler optimizations that result in (anecdotally) very performant binaries
 
-We use Rust for this project, together with the CLI parser [[https://docs.rs/clap/2.33.0/clap][clap-rs]] and the serialization framework [[https:docs.rs/clap/2.33.0/clap/][serde-rs]].
+We use Rust for this tutorial project, together with the CLI parser [[https://docs.rs/clap/2.33.0/clap][clap-rs]] and the serialization framework [[https:docs.rs/clap/2.33.0/clap/][serde-rs]].
 
 ** Installation and Usage
 
-To get set up with the Rust toolchain, see the [[https:www.rust-lang.org/learn/get-started][Getting Started page]] provided on the official website.
+To get set up with the Rust toolchain, see the [[https://www.rust-lang.org/learn/get-started][Getting Started page]] provided on the official website.
 
 This tutorial assumes that the user is setup with Cargo, Rustup, and an IDE/editor of his/her choice. Please refer to the Rust website or contact the maintainer(s) if any more clarification is necessary.
 
@@ -26,4 +28,28 @@ This will be a three-week online tutorial where, in each week, we produce some u
 
 Week 1 will focus on setting up the CLI with clap and representing the application state with Rust's data structures. In Week 2, we will serialize and deserialize our application state (tasks in our to-do list) to disk. Finally, in Week 3, we'll look into converting our to-do list UI to function as a REPL.
 
-UPDATE: [[https://github.com/hariamoor/todo-cli/wiki/Week-1][Week 1 now available.]]
+Please also see [[file:PREREQUISITES.org][PREREQUISITES.org]].
+
+** Further Resources
+
+Please also feel free to utilize the following resources provided by the maintainers and the Rust community.
+
+*** Rutgers-specific Questions
+
+Please contact the maintainers via a GitHub issue or a personal email.
+
+*** Questions about Systems Programming, Type Theory, any of the asides...
+
+Please make a GitHub issue detailing your question(s), in case others have the same ones.
+
+*** Questions about Rust
+
+We provide the following (running) list of Rust resources:
+
+- [[https:github.com/dtonlay/rust-faq][Maintainer David Tonlay's Rust FAQ]]
+- Books:
+  - [[https:doc.rust-lang.org/book/][Rust book]]
+  - Rust [[https:www.rust-lang.org/learn/get-started][async book]] (for concurrent programming)
+  - The [[https:www.reddit.com/r/rust/][Rust subreddit]]
+  - [[https:github.com/nrc/r4cppp][r4cppp tutorial]] (recommended only with sufficient C/C++ background)
+  - [[https:stevedonovan.github.io/rust-gentle-intro/][A Gentle Introduction to Rust]]

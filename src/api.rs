@@ -9,7 +9,7 @@ pub mod api {
 
     pub static BACKUP_FILE: &str = "tasks.json";
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[derive(Serialize, Deserialize, Debug)]
     pub struct ToDoList<T>
     where
         T: Display + Serialize,
@@ -58,7 +58,7 @@ pub mod api {
         }
     }
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[derive(Debug)]
     pub enum Instruction<T> {
         Add(T),
         Remove(usize),

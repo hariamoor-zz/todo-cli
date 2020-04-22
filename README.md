@@ -5,8 +5,8 @@ In this 2-week online programming tutorial, we will be building a to-do
 list management CLI in Rust. Each weekly lesson is served as a
 programming guide (see Wiki).
 
-UPDATE: [Week 1 now available](content/Week-1.md)\
-UPDATE: [Week 2 now available](content/Week-2.md)
+UPDATE: [Part 1 now available](content/Part-1.md)\
+UPDATE: [Part 2 now available](content/Part-2.md)
 
 Why Rust?
 ---------
@@ -45,7 +45,7 @@ contact the maintainer(s) if any more clarification is necessary.
 Tutorial Format
 ---------------
 
-This will be a three-week online tutorial where, in each week, we
+This will be a two-part online tutorial where, in each week, we
 produce some usable and testable component of software.
 
 Week 1 will focus on setting up the CLI with clap and representing the
@@ -53,7 +53,13 @@ application state with Rust\'s data structures. Finally, in Week 2, we will
 serialize and deserialize our application state (tasks in our to-do
 list) to disk.
 
-Please also see [PREREQUISITES.org](PREREQUISITES.org).
+We also provide _asides_, which are intended to provide information that is not necessary
+for the tutorial, but is nonetheless very useful. Please see the [general asides](content/General-Asides.md)
+and the [Rust asides](content/Rust-Asides.md). The general asides provide information on
+language-agnostic design patterns, while the Rust asides discuss design
+patterns appropriate specifically for Rust.
+
+Please also see [PREREQUISITES.md](PREREQUISITES.md).
 
 Further Resources
 -----------------

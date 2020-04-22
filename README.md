@@ -1,7 +1,7 @@
 Building a Rusty To-Do List CLI
 ===============================
 
-In this 3-week online programming tutorial, we will be building a to-do
+In this 2-week online programming tutorial, we will be building a to-do
 list management CLI in Rust. Each weekly lesson is served as a
 programming guide (see Wiki).
 
@@ -49,10 +49,9 @@ This will be a three-week online tutorial where, in each week, we
 produce some usable and testable component of software.
 
 Week 1 will focus on setting up the CLI with clap and representing the
-application state with Rust\'s data structures. In Week 2, we will
+application state with Rust\'s data structures. Finally, in Week 2, we will
 serialize and deserialize our application state (tasks in our to-do
-list) to disk. Finally, in Week 3, we\'ll look into converting our to-do
-list UI to function as a REPL.
+list) to disk.
 
 Please also see [PREREQUISITES.org](PREREQUISITES.org).
 

@@ -34,10 +34,6 @@ The configuration used by the maintainer(s) is [supplied in the source repositor
 
 ## Step 1: Define Appropriate Data Types
 
-<!---
-I made `Instruction` and `ToDoList` monadic since last time in favor of a possible bonus project
--->
-
 Last week, we defined our `Instruction` type as follows:
 
 ```rust
@@ -88,3 +84,124 @@ where
 ```
 
 Of course, this has to be similarly compatible with `serde-rs`. Furthermore, since we'll be serializaing and displaying (printing to memory) our generic type `T` later, we must ensure that it implements the `Serialize` and `Display `traits; otherwise, the Rust compiler won't know what we want when we ask it to do these things.
+
+
+## Step 2: Implement core logic
+
+This will be the core logic of the application. We couple two functions, `new` and `run`, with our `ToDoList<T>`; the former will return a new instance of `ToDoList`, given the user's name, and the latter will perform the required operation.
+
+`new` is a very simply-defined function:
+
+```rust
+pub fn new(name: String) -> ToDoList<T> {
+    ToDoList {
+		tasks: Vec::new(),
+		name: name,
+	}
+}
+```
+
+Much less trivial is the `run` function. Here, we print the to-do list using the [prettytable-rs](https://docs.rs/prettytable-rs/0.8.0/prettytable/index.html) crate. Below is an example of the desired output, which represents the to-do list in a tabular format:
+
+```
+hamoor's To-Do List:
+
++---+-------------+
+| 1 | New task    |
++---+-------------+
+| 2 | Second task |
++---+-------------+
+| 3 | Third task  |
++---+-------------+
+```
+
+Note that we index our list starting with 1; how will this affect user input, and how must we adjust accordingly, given that our list is backed by an array-like structure?
+
+Finally, we present the `run` function. Here, we make use of Rust's [pattern-matching syntax](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) to dynamically destructure our `Instruction` type:
+
+```rust
+pub fn run(&mut self, inst: Instruction<T>) {
+	match inst {
+		Instruction::Add(task) => self.tasks.push(task),
+		Instruction::Modify(i, t) => self.tasks[i - 1] = t,
+		Instruction::Remove(i) => {
+			self.tasks.remove(i - 1);
+		}
+		Instruction::Print => {
+			if !self.tasks.is_empty() {
+				let mut table = Table::new();
+				
+				for (i, s) in self.tasks.iter().enumerate() {
+					table.add_row(row![(i + 1).to_string(), s]);
+				}
+				
+				println!("\n\n{}'s To-Do List:\n", self.name);
+				table.printstd();
+			} else {
+				println!("No tasks to print for {}", self.name);
+			}
+		}
+	}
+}
+```
+
+Note that we expect user input of indices to be in terms of the presented format, i.e. with indexing starting at 1; this is why we subtract 1 from the same before applying it to the underlying vector type `tasks`.
+
+Finally, we implement the `Drop` trait for `ToDoList<T>`. The `Drop` trait implements a single function, `drop`, which specifies the appropriate way to destroy a `struct` (see the [documentation on the Drop trait](https://doc.rust-lang.org/std/ops/trait.Drop.html) for additional information). We apply it here so that our `ToDoList` serializes itself to a JSON file upon deallocation:
+
+```rust
+fn drop(&mut self) {
+	let userdata = json::to_string_pretty(self).unwrap();
+	fs::write(BACKUP_FILE, userdata).unwrap();
+}
+```
+
+With these three functions, we implement an _API_ of sorts for frontends for our core logic. Theoretically, a user could use the `new` and `run` functions to configure input/output to the application arbitrarily.
+
+BONUS: Use the [linefeed crate](https://docs.rs/linefeed/0.6.0/linefeed/) to implement a REPL that allows for multiple modifications on the fly.\
+ANOTHER BONUS: In [our source code](../src/api.rs), we provide an automated test for our core API; this can be run with `cargo test`. Apply the [best practices for automated testing](https://doc.rust-lang.org/book/ch11-01-writing-tests.html) to test the other parts of the application.
+
+## Step 3: Providing a User-Interface
+
+On completion of Step 2, we find ourselvses with a fully-functional to-do list application. The final step is to write a `main` function, which provides an entry-point to run the application with, i.e. using the shell command `cargo run -- <subcommand> <args>`.
+
+Here, our `main` function simply checks to see if there is an existing to-do list. If so, it loads it from disk and performs the required operation on it; otherwise, it creates a new to-do list. Next, it calls the `parse()` function defined in Week 1 to parse user input and return in the appropriate format.
+
+In either case, it uses the environment variable `$USER` to distinguish the user's name; how might we make this configurable in the future?
+
+```rust
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut list: ToDoList<String> = match File::open(BACKUP_FILE) {
+        Ok(file) => {
+            // file exists - deserialize and go with existing list
+            let file = BufReader::new(file);
+            serde_json::from_reader(file)?
+        }
+        Err(_) => {
+            // file does not exist - make a new list
+            ToDoList::new(env!("USER").to_string())
+        }
+    };
+
+    match parse() {
+        Some(inst) => list.run(inst),
+        None => panic!("Arguments could not be parsed"),
+    }
+	
+    Ok(())
+}
+```
+
+## Step 4: Possibilities for Extension
+
+Congrats! We've now built a functional to-do list CLI application in Rust!
+
+How can we make this even more awesome than it is now? Some ideas for future development:
+
+1. We currently represent each task as a string, but in reality, all we need is for it to be serializable via the `Serialize` trait provided by `serde-rs`, and to be able to display it via the `Display` trait provided in the standard library. Extend this to store additional information about tasks: Deadlines? Partners? Associated notes? The possibilities are endless!
+
+2. Currently, we store our to-do list in a flat JSON file: What if it got too big to sustainably maintain that? What if the user wants his information stored in some more secure format? What if the user wants to sync it with other applications? Can we extend our persistent representation of our to-do list to support some of these requests?
+
+3. How can we distribute our to-do list to potential users via the Rust ecosystem? Naturally, we would use Cargo as our build system; where would we need to make it available, so that potential users could have what they need with the simple shell command `cargo install todo-cli`?
+
+These are some potential future considerations you might explore in your continuing journey as a Rustacean. Good luck!

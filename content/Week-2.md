@@ -95,9 +95,9 @@ This will be the core logic of the application. We couple two functions, `new` a
 ```rust
 pub fn new(name: String) -> ToDoList<T> {
     ToDoList {
-		tasks: Vec::new(),
-		name: name,
-	}
+	tasks: Vec::new(),
+	name: name,
+    }
 }
 ```
 
@@ -121,27 +121,27 @@ Finally, we present the `run` function. Here, we make use of Rust's [pattern-mat
 
 ```rust
 pub fn run(&mut self, inst: Instruction<T>) {
-	match inst {
-		Instruction::Add(task) => self.tasks.push(task),
-		Instruction::Modify(i, t) => self.tasks[i - 1] = t,
-		Instruction::Remove(i) => {
-			self.tasks.remove(i - 1);
-		}
-		Instruction::Print => {
-			if !self.tasks.is_empty() {
-				let mut table = Table::new();
-				
-				for (i, s) in self.tasks.iter().enumerate() {
-					table.add_row(row![(i + 1).to_string(), s]);
-				}
-				
-				println!("\n\n{}'s To-Do List:\n", self.name);
-				table.printstd();
-			} else {
-				println!("No tasks to print for {}", self.name);
-			}
-		}
+    match inst {
+	Instruction::Add(task) => self.tasks.push(task),
+	Instruction::Modify(i, t) => self.tasks[i - 1] = t,
+	Instruction::Remove(i) => {
+	    self.tasks.remove(i - 1);
 	}
+	Instruction::Print => {
+	    if !self.tasks.is_empty() {
+		let mut table = Table::new();
+		
+		for (i, s) in self.tasks.iter().enumerate() {
+		    table.add_row(row![(i + 1).to_string(), s]);
+		}
+		
+		println!("\n\n{}'s To-Do List:\n", self.name);
+		table.printstd();
+	    } else {
+		println!("No tasks to print for {}", self.name);
+	    }
+	}
+    }
 }
 ```
 
@@ -151,8 +151,8 @@ Finally, we implement the `Drop` trait for `ToDoList<T>`. The `Drop` trait imple
 
 ```rust
 fn drop(&mut self) {
-	let userdata = json::to_string_pretty(self).unwrap();
-	fs::write(BACKUP_FILE, userdata).unwrap();
+    let userdata = json::to_string_pretty(self).unwrap();
+    fs::write(BACKUP_FILE, userdata).unwrap();
 }
 ```
 
@@ -187,7 +187,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(inst) => list.run(inst),
         None => panic!("Arguments could not be parsed"),
     }
-	
+    
     Ok(())
 }
 ```

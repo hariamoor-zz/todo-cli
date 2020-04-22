@@ -68,7 +68,7 @@ There are other ways to pattern match against more complex enums too: you use [m
 
 ## Aside: Serialization
 
-The `serde-rs` library, used in this tutorial, is considered by the open-source community to be the gold standard for safe and predictable serialization. It provides a common API to interact with a multitude of formats, including JSON, Bincode, Pickle (in the Python world), YAML, and more! Both from a usability perspective and a safety perspective, `serde-rs** provides a much better framework for serialization than others of its kind. Below, we provide a comparison between `serde-rs** and similar serialization frameworks in other languages:
+The `serde-rs` library, used in this tutorial, is considered by the open-source community to be the gold standard for safe and predictable serialization. It provides a common API to interact with a multitude of formats, including JSON, Bincode, Pickle (in the Python world), YAML, and more! Both from a usability perspective and a safety perspective, `serde-rs` provides a much better framework for serialization than others of its kind. Below, we provide a comparison between `serde-rs** and similar serialization frameworks in other languages:
 
 ### Java's Default Serialization
 

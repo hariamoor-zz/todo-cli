@@ -5,7 +5,7 @@ In this 3-week online programming tutorial, we will be building a to-do
 list management CLI in Rust. Each weekly lesson is served as a
 programming guide (see Wiki).
 
-UPDATE: [Week 1 now available](content/Week-1.md)
+UPDATE: [Week 1 now available](content/Week-1.md)\
 UPDATE: [Week 2 now available](content/Week-2.md)
 
 Why Rust?

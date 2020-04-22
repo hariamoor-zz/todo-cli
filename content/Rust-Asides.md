@@ -65,3 +65,21 @@ For `enums`, these bindings are not irrefutable: the value being destructured mi
 The `if let` lets you conditionally bind variables to further aid managing `enum`s. This means, instead of only having `?` to boot errors further up the stack, you have `if let` to handle the error.
 
 There are other ways to pattern match against more complex enums too: you use [match](https://doc.rust-lang.org/book/ch18-01-all-the-places-for-patterns.html#match-arms).
+
+## Aside: Serialization
+
+The `serde-rs` library, used in this tutorial, is considered by the open-source community to be the gold standard for safe and predictable serialization. It provides a common API to interact with a multitude of formats, including JSON, Bincode, Pickle (in the Python world), YAML, and more! Both from a usability perspective and a safety perspective, `serde-rs** provides a much better framework for serialization than others of its kind. Below, we provide a comparison between `serde-rs** and similar serialization frameworks in other languages:
+
+### Java' Default Serialization
+
+With Java, objects could be created arbitrarily with serialization and deserialization; this is intrinsically unsafe. In particular, you could inject a crafted serialized object into the program's input, and create any object - potentially one that could hijack the program - therein. Generally speaking, the Java community acknowledges that it was a bad idea to publicly use such a _flexible_ method of serialization, and users of this framework in industry generally tend to have to wrap it with their own paradigms.
+
+With Rust and `serde-rs`, however, you have a much more strict and well-defined deserialization process. If you want a `struct` to deserialize from a JSON document, but only take in some of its fields, then that's all you're going to get. Similarly, arbitrary objects cannot be created the same way they can in Java; in fact, there's very little, if any, opportunity for external programs to hijack control of your Rust program through `serde-rs`.
+
+### C++' Serialization with Boost
+
+This Rust API for serialization is generally considered more _expressive_ than that provided by the Boost framework in C++; this is because, while you can serialize/deserializae objects in C++ as you can in Rust, you cannot use arbitrary formatting.
+
+### Haskell's `Data.Serialize`
+
+Who the fuck goes to production with Haskell, in the first place...?

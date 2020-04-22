@@ -54,8 +54,9 @@ serialize and deserialize our application state (tasks in our to-do
 list) to disk.
 
 We also provide _asides_, which are intended to provide information that is not necessary
-for the tutorial, but is nonetheless very useful. Please see the [general asides](content/General-Asides.md)
-and the [Rust asides](content/Rust-Asides.md). The general asides provide information on
+for the tutorial, but is nonetheless very useful. Please see the
+[general asides](content/General-Asides.md) and the 
+[Rust asides](content/Rust-Asides.md). The general asides provide information on
 language-agnostic design patterns, while the Rust asides discuss design
 patterns appropriate specifically for Rust.
 

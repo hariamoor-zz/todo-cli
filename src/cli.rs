@@ -37,7 +37,7 @@ pub mod cli {
 	    }
         } else if let Some(matches) = matches.subcommand_matches("modify") {
             return Some(Instruction::Modify(
-		// This code might panic. Why? Exercise(Week 1): gracefully handle
+		// This code might panic. Why? Exercise(Part 1): gracefully handle
 		// the error case.
                 matches.value_of("NUM")?.parse().unwrap(),
                 matches.value_of("NEW")?.to_string(),

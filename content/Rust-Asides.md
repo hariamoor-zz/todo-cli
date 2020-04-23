@@ -89,3 +89,68 @@ Who the fuck goes to production with Haskell, in the first place...?
 Well, that's not really an argument, if Haskell were doing the right thing. Fortunately, we have avoided having to recant: `Data.Serialize` is a lot like the Boost system that exists for C++. The key difference is that the serialization contract is explicit, but it is messier as it lifts the `Builder` monad to form a custom serialization monad.
 
 `Data.Serialize` is also not as complete as serde, lacking any in-built support for the variety of formats serde does.
+
+## Aside: The Layout of a Rust Application
+
+If you're reading this you either somehow like the schizoid writing style of this tutorial or you ignored our mild suggestion to read the Rust book. In case that suggestion was too mild, we recommend you read through [the Rust book](https://doc.rust-lang.org/book/) again.
+
+Not yet suggestive enough? Luckily for you, the writer with this tone likes the sound of their own voice and will get you up to speed on some basics imminently. Again, this isn't a replacement for [the book](https://doc.rust-lang.org/book/), just, at best, a suppliment that focusses on points that will come up in starting on the app.
+
+That is, what to start with? Let's really empty the canvas and suppose that the code wasn't actually already present under `../src`. The easiest thing to do is `cargo new app <name>` in a shell of your choice. This would make this sort of directory tree:
+
+- <name>
+  - src
+    - main.rs
+  - Cargo.toml
+  - .git (yes, by default, cargo makes you a git repo too -- what a great friend!)
+
+The `Cargo.toml` describes the app, naming it, versioning it, and listing its dependencies. Hence, if you need a dependency, it's easiest to add it to this list so that you have it when you rebuild. This is covered in more detail as we install clap-rs and serde. Hence, let's move on to the other file: `main.rs`.
+
+Here, cargo will have given you a main function, but let's talk in broader strokes for this aside.
+
+### Aside in the Aside: The Layout of Rust Code
+
+This is a broad overview of what goes where in Rust. This, like the aside it's in, is not a replacement for [the book](https://doc.rust-lang.org/book/), but a sub-section to aid you in reading the source code we provide.
+
+As a descendant of C, Rust uses `{}` for blocks. There are four levels of blocks we'll nest our way into (this is in order of the tutorial's presentation):
+
+1. Module
+1. Struct, Enum, or trait declaration
+1. Function
+1. Impl block
+
+Here's a fuller arrangement of what the blocks are and how they nest (simplified to only include common patterns):
+
+- Module
+  - Struct, trait, or enum declaration
+  - Impl block
+    - Function
+  - Function
+
+Inside a function, there's control-flow. This is discussed in more detail as needed, so will be glossed over for our broad strokes. In fact, the broader strokes below only briefly sketch modules and impl blocks (the rest are assumed to be legible or covered as they are brought up).
+
+### Aside in the Aside: Modules
+
+Zerothly: the book has more details [here](https://doc.rust-lang.org/1.30.0/book/2018-edition/ch07-00-modules.html).
+
+Firstly, a bit of philosophy:
+
+> Namespaces are a honking great idea -- let's do more of those! --_Tim Peters, the Zen of Python_
+
+So? The first thing is that every `filename.rs` is implicitly in a module `filename`. But there's more! Rust has a module keyword so you can nest as much as you'd like with just one file. `pub` makes things public because everything is private by default (yay, encapsulation!). Hence, you'll see that our `cli.rs` opens with `pub mod cli {`.
+
+In order to use modules elsewhere, you need to `use` them. This also has a couple edge cases:
+
+- If the module is another file in your application, you have to declare it with `mod filename;` in your `main.rs`.
+- If the module is from a crate you're depending on, you have to forward-declare it with `extern crate toplevel_name_of_crate;`.
+
+To use your own modules from your application in your application, note that you have to `use crate::<module path>`. Inner modules are referred to after the `::`. All these edge cases appear in our `main.rs`.
+
+### Aside in the Aside: impl blocks
+
+These blocks implement functions on data types. These are the methods in Java. There are two flavors of impl block:
+
+- Standalone
+- impl trait
+
+A standalone `impl` block reads `impl <type> {` and in the block, you list out methods and implement them. These will be the methods your object can use. `self` is a magic keyword in the block that refers to the instance of the object you're calling the method on (if it's absent, the method is like a static function in Java or C++). `Self` is a magic keyword for the type that you're implementing methods for.

@@ -1,12 +1,6 @@
-<!---
-Needed asides:
-- 3-tier architecture and applications outside of webdev
-- Problems with serialization in other languages - how Serde aims to solve them in Rust
--->
-
 # Serializing Application State to Disk
 
-In this, our second, week, we'll proceed to modeling our persistent-state. Here, we develop the app's "backend", which provides an API of some sort for the "frontend" to interact with to serve the users.
+In this, our second week, we'll proceed to modeling our persistent-state. Here, we develop the app's "backend", which provides an API of some sort for the "frontend" to interact with to serve the users. [Here's an aside explaining this analogy.](General-Asides#aside-3-tiered-architectures "Miraculous that you should care.")
 
 ## Strategies for Managing Application State
 
@@ -18,13 +12,13 @@ Instead, we use persistent memory, i.e. in a hard disk, to store our to-do list.
 
 ## Data Representation in Persistent Memory
 
-Writing our to-do list to persistent memory is all well and good, but how exactly do we do that? We generally cannot write arbitrarily-defined program variables to disk - we can only store sequences of characters, i.e. bytes.
+Writing our to-do list to persistent memory is all well and good, but how exactly do we do that? We generally cannot write arbitrarily-defined program variables to disk - we can only store sequences of characters, i.e. bytes. And we must have some consistency so that we can also read the memory that we persist.
 
 In order to effectively represent our memory in a way that it can be stored on disk, we apply a paradigm called [serialization](https://en.wikipedia.org/wiki/Serialization). Serialization is the process of translating data structures and object state represented in a program into a format that can be stored in disk, transmitted across a network connection, and reconstructed later. This practice is widely applied in many different fields of software engineering; it's useful just about anywhere that multiple components of software need to interface with each other, which is to say, everywhere.
 
 At a high level, once we know that the user is finished interacting with the to-do list, e.g. when it is scheduled by the Rust compiler to be freed from memory, we can serialize it and write to disk. Similarly, once we know that the user wants to once again interact with the to-do list, we load it from disk and _deserialize_ it back into the original format.
 
-The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore.
+The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore. For more on how serde compares with competitors, [see this aside](Rust-Asides#aside-serialization "Wherein we just gloat about Rust being cooler than us.").
 
 ## Setting Up
 
@@ -47,7 +41,7 @@ pub enum Instruction {
 
 However, we must first ask ourselves; when and why did we assume that each task would be stored as a string? It would indeed be convenient if that's all we needed to store, but what if we wanted to also store a due date at some point in the future? What if we wanted to expand our definition of what a task in our to-do list looks like?
 
-In software, rapidly changing requirements like these are all too common. Thus, we would like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this exact use case easily and idiomatically. We add a _parametriized generic type_ as follows:
+In software, rapidly changing requirements like these are all too common. Thus, we would like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this exact use case easily and idiomatically. We add a _parametrized generic type_ as follows:
 
 ```rust
 pub enum Instruction<T> 
@@ -70,7 +64,7 @@ pub enum Instruction<T> {
 }
 ```
 
-Next, we define a `ToDoList` type, which help us represent the list itself. It will have two fields; a list of tasks, represented as a `Vec` (a heap-allocated array), and the `String`-encoded name of the user.
+Next, we define a `ToDoList` type, which help us represent the list itself. It will have two fields; a list of tasks, represented as a `Vec` (a heap-allocated array, like a Java `ArrayList` or C++ `std::vector`), and the `String`-encoded name of the user.
 
 ```rust
 #[derive(Debug)]
@@ -90,7 +84,7 @@ Of course, this has to be similarly compatible with `serde-rs`. Furthermore, sin
 
 This will be the core logic of the application. We couple two functions, `new` and `run`, with our `ToDoList<T>`; the former will return a new instance of `ToDoList`, given the user's name, and the latter will perform the required operation.
 
-`new` is a very simply-defined function:
+`new` is a very simply-defined function (you have to put this in the body of an `impl<T> ToDoList<T> {}`):
 
 ```rust
 pub fn new(name: String) -> ToDoList<T> {
@@ -115,7 +109,7 @@ hamoor's To-Do List:
 +---+-------------+
 ```
 
-Note that we index our list starting with 1; how will this affect user input, and how must we adjust accordingly, given that our list is backed by an array-like structure?
+Note that we index our list starting with 1: how will this affect user input, and how must we adjust accordingly, given that our list is backed by an array-like structure?
 
 Finally, we present the `run` function. Here, we make use of Rust's [pattern-matching syntax](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) to dynamically destructure our `Instruction` type:
 
@@ -123,6 +117,8 @@ Finally, we present the `run` function. Here, we make use of Rust's [pattern-mat
 pub fn run(&mut self, inst: Instruction<T>) {
     match inst {
 	Instruction::Add(task) => self.tasks.push(task),
+	// What if we wanted to handle the case where this
+	// user-provided index is out of bounds?
 	Instruction::Modify(i, t) => self.tasks[i - 1] = t,
 	Instruction::Remove(i) => {
 	    self.tasks.remove(i - 1);
@@ -132,6 +128,7 @@ pub fn run(&mut self, inst: Instruction<T>) {
 		let mut table = Table::new();
 		
 		for (i, s) in self.tasks.iter().enumerate() {
+		    // why are we adding one to `i`?
 		    table.add_row(row![(i + 1).to_string(), s]);
 		}
 		
@@ -200,7 +197,7 @@ How can we make this even more awesome than it is now? Some ideas for future dev
 
 1. We currently represent each task as a string, but in reality, all we need is for it to be serializable via the `Serialize` trait provided by `serde-rs`, and to be able to display it via the `Display` trait provided in the standard library. Extend this to store additional information about tasks: Deadlines? Partners? Associated notes? The possibilities are endless!
 
-2. Currently, we store our to-do list in a flat JSON file: What if it got too big to sustainably maintain that? What if the user wants his information stored in some more secure format? What if the user wants to sync it with other applications? Can we extend our persistent representation of our to-do list to support some of these requests?
+2. Currently, we store our to-do list in a flat JSON file: What if it got too big to sustainably maintain that? What if the user wants their information stored in some more secure format? What if the user wants to sync it with other applications? Can we extend our persistent representation of our to-do list to support some of these requests?
 
 3. How can we distribute our to-do list to potential users via the Rust ecosystem? Naturally, we would use Cargo as our build system; where would we need to make it available, so that potential users could have what they need with the simple shell command `cargo install todo-cli`?
 

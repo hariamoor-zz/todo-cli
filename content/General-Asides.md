@@ -2,6 +2,20 @@
 
 These are points about broader concepts in programming that come up in the tutorial but aren't quite isolated to Rust.
 
+## Aside: 3 Tiered Architectures
+
+Wikipedia offers [a nice summary](https://en.wikipedia.org/wiki/Multitier_architecture).
+
+This is related to a universal problem in computer science: that permanent storage comes at a high cost. This is brought up as we embark on serialization in week 2, but is normally used in web development. Roughly, here are the three tiers we are talking about:
+
+| Name | Definition | In Our Code | Out There on the Web |
+|---|---|---|---|
+| Presentation layer | The user-facing part of the code | cli.rs | Angular, React, Vue.js, ... |
+| Application layer | The part of the code that decides what to store | api.rs | Flask, Django, Express.js |
+| Storage layer (AKA data access layer) | The part that stores the data | serde | MySQL, Mongo, Firebase |
+
+The vulgar may want to say that clap.rs is our frontend framework.
+
 ## Aside: Sum Types
 
 This, to the uninitiated, must be strange: the enum seems to be able to reference other fields, like the index or the description. This is not a struct. In type theory, this is a sum type.

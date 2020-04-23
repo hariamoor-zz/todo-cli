@@ -36,7 +36,7 @@ Technically, this is a new control flow operation. `args` lives in its own scope
 
 As mentioned above, the standard library has two error-reporting types: `Option` if you don't care to tell callers what failed and `Result` if you do.
 
-### Aside: Similarity to the Ubiquitous `null` type
+### Aside in the Aside: Similarity to the Ubiquitous `null` type
 
 Rustaceans with backgrounds in C-based languages can be quick to retort that `Option` is a glorified null-pointer. However, this is not true. Historically, `null` in OO languages has been implemented as a invariant pointer to an immutable memory address, e.g. `const void *NULL = 0` in C. It's traditionally used as a "default" type or a placeholder, which is intrinsically an unsafe notion, since null-checks aren't rigorously enforced by the compiler.
 
@@ -44,13 +44,13 @@ Rustaceans with backgrounds in C-based languages can be quick to retort that `Op
 
 The `None` enumeration in Rust's `Option` type, on the other hand, is a very different notion. The idea is that, in these exceptional situations, you can either explicitly address the error case or, if the current function returns a type of the same enumeration, use the `?` operator to [propagate the errors up the call-stack](https://doc.rust-lang.org/edition-guide/rust-2018/error-handling-and-panics/the-question-mark-operator-for-easier-error-handling.html).
 
-#### Aside in the Aside: Zero Cost Abstractions
+#### Aside in the Aside in the Aside: Zero Cost Abstractions
 
 Yay! We have a type. The issue, however, with types, is that they can be slower to manage after the code is compiled. After all, in C, bare pointers are tiny -- fitting in registers. But what about some `Option` thing? What's its size?
 
-Here, the Rust compiler has a trick up its sleave: if your type is like a pointer, rust will compile the matches against an `Option` to the nullity check that the good C programmer would've written.
+Here, the Rust compiler has a trick up its sleave: if your type is like a pointer, rust will compile the matches against an `Option` to the nullity check that the good C programmer would've written. (So the Rustecean from the aside above is right in some cases, and in a literal sense.)
 
-This is a general principle in Rust: a lot of safer and elegant parts of the code actually come at no runtime cost. The better example will be seen with traits in the upcoming weeks.
+This is a general principle in Rust: a lot of safer and elegant parts of the code actually come at no runtime cost. There is one other classic example Rusteceans use to gloat: the memory safety comes at no cost -- to the programmer or the compiled program.
 
 ## Aside: Bindings
 
@@ -66,9 +66,11 @@ The `if let` lets you conditionally bind variables to further aid managing `enum
 
 There are other ways to pattern match against more complex enums too: you use [match](https://doc.rust-lang.org/book/ch18-01-all-the-places-for-patterns.html#match-arms).
 
+(For the category-theory inclined: this has to do with the universal mapping properties of products and coproducts. The irrefutable case is essentially stating that if you have a product over types `T` and `U` (say a tuple `(T, U)`), every map from a type `V` into `T` and `U` factors through the product type. The refutable case has to do with coproducts. The duality means that we cannot be sure we have such a similar factoring.)
+
 ## Aside: Serialization
 
-The `serde-rs` library, used in this tutorial, is considered by the open-source community to be the gold standard for safe and predictable serialization. It provides a common API to interact with a multitude of formats, including JSON, Bincode, Pickle (in the Python world), YAML, and more! Both from a usability perspective and a safety perspective, `serde-rs` provides a much better framework for serialization than others of its kind. Below, we provide a comparison between `serde-rs` and similar serialization frameworks in other languages:
+The `serde-rs` library, used in this tutorial, is considered by the open-source community to be the gold standard for safe and predictable serialization. It provides a common API to interact with a multitude of formats, including JSON, Bincode, Pickle (in the Python world), YAML, and more! Both from a usability perspective and a safety perspective, `serde-rs` provides a much better framework for serialization than others of its kind. Below, we provide a cursory comparison between `serde-rs` and similar serialization frameworks in other languages:
 
 ### Java's Default Serialization
 
@@ -78,8 +80,12 @@ With Rust and `serde-rs`, however, you have a much more strict and well-defined 
 
 ### C++'s Serialization with Boost
 
-This Rust API for serialization is generally considered more _expressive_ than that provided by the Boost framework in C++; this is because, while you can serialize/deserializae objects in C++ as you can in Rust, you cannot use arbitrary formatting.
+This Rust API for serialization is generally considered more _expressive_ than that provided by the Boost framework in C++; this is because, while you can serialize/deserialize objects in C++ as you can in Rust, the contracts you must fulfill for custom formatting is less clear (since C++ templates are not as expressive as Rust's traits). Furthermore, the C++ libraries for serialization are not as all-encompassing as serde: there is no one library (known to the authors) that serializes into all the formats that serde does.
 
 ### Haskell's `Data.Serialize`
 
 Who the fuck goes to production with Haskell, in the first place...?
+
+Well, that's not really an argument, if Haskell were doing the right thing. Fortunately, we have avoided having to recant: `Data.Serialize` is a lot like the Boost system that exists for C++. The key difference is that the serialization contract is explicit, but it is messier as it lifts the `Builder` monad to form a custom serialization monad.
+
+`Data.Serialize` is also not as complete as serde, lacking any in-built support for the variety of formats serde does.

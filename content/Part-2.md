@@ -44,7 +44,7 @@ However, we must first ask ourselves; when and why did we assume that each task 
 In software, rapidly changing requirements like these are all too common. Thus, we would like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this exact use case easily and idiomatically. We add a _parametrized generic type_ as follows:
 
 ```rust
-pub enum Instruction<T> 
+pub enum Instruction<T> {
     Add(T),
     Remove(usize),
     Modify(usize, T),

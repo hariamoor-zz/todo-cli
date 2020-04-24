@@ -48,8 +48,8 @@ Tutorial Format
 This will be a two-part online tutorial where, in each week, we
 produce some usable and testable component of software.
 
-Week 1 will focus on setting up the CLI with clap and representing the
-application state with Rust\'s data structures. Finally, in Week 2, we will
+Part 1 will focus on setting up the CLI with clap and representing the
+application state with Rust\'s data structures. Finally, in Part 2, we will
 serialize and deserialize our application state (tasks in our to-do
 list) to disk.
 

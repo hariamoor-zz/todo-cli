@@ -5,11 +5,11 @@ use std::io::BufReader;
 mod api;
 mod cli;
 
-use crate::api::api::ToDoList;
-use crate::cli::cli::parse;
+use crate::api::ToDoList;
+use crate::cli::parse;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut list: ToDoList<String> = match File::open(api::api::BACKUP_FILE) {
+    let mut list: ToDoList<String> = match File::open(api::BACKUP_FILE) {
         Ok(file) => {
             // file exists - deserialize and go with existing list
             let file = BufReader::new(file);

@@ -1,7 +1,10 @@
 use crate::api::Instruction;
-use clap::clap_app;
+use std::error::Error;
 
-pub fn parse() -> Option<Instruction<String>> {
+use clap::clap_app;
+use simple_error::bail;
+
+pub fn parse() -> Result<Instruction<String>, Box<dyn Error>> {
     let matches = clap_app!(todo_cli =>
         (version: "0.1")
         (author: "USACS at Rutgers Uo list CLI in Rust")
@@ -25,24 +28,32 @@ pub fn parse() -> Option<Instruction<String>> {
     .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("add") {
-        return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
+        return Ok(Instruction::Add(
+            matches
+                .value_of("NEW")
+                .expect("Need task to add")
+                .to_string(),
+        ));
     } else if let Some(matches) = matches.subcommand_matches("rm") {
-        // Why can't we use a `?` after the parse?
-        return if let Ok(idx) = matches.value_of("NUM")?.parse() {
-            Some(Instruction::Remove(idx))
-        } else {
-            None
-        };
+        return Ok(Instruction::Remove(
+            matches.value_of("NEW").expect("Need task to add").parse()?,
+        ));
     } else if let Some(matches) = matches.subcommand_matches("modify") {
-        return Some(Instruction::Modify(
+        return Ok(Instruction::Modify(
             // This code might panic. Why? Exercise(Week 1): gracefully handle
             // the error case.
-            matches.value_of("NUM")?.parse().unwrap(),
-            matches.value_of("NEW")?.to_string(),
+            matches
+                .value_of("NUM")
+                .expect("Need index of task to modify".as_ref())
+                .parse()?,
+            matches
+                .value_of("NEW")
+                .expect("Need task to modify to")
+                .to_string(),
         ));
     } else if matches.is_present("print") {
-        return Some(Instruction::Print);
+        return Ok(Instruction::Print);
     }
 
-    return None;
+    bail!("Command-line arguments could not be parsed");
 }

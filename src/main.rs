@@ -5,11 +5,11 @@ use std::io::BufReader;
 mod api;
 mod cli;
 
-use crate::api::ToDoList;
+use crate::api::{ToDoList, BACKUP_FILE};
 use crate::cli::parse;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut list: ToDoList<String> = match File::open(api::BACKUP_FILE) {
+pub(crate) fn main() -> Result<(), Box<dyn Error>> {
+    let mut list: ToDoList<String> = match File::open(BACKUP_FILE) {
         Ok(file) => {
             // file exists - deserialize and go with existing list
             let file = BufReader::new(file);
@@ -25,5 +25,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(inst) => list.run(inst),
         None => panic!("Arguments could not be parsed"),
     }
+
     Ok(())
 }

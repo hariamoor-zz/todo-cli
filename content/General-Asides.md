@@ -42,3 +42,15 @@ One of Rust's most salient claims-to-fame is that it provides "fearless concurre
 First of all, variables are mutable by default; you can't have race conditions if you nobody can write to data! Immutability is a common design pattern that makes it easy for functional programming languages such as Clojure, through `core.async`, and Erlang through the language itself; with this, you can exploit lock-free concurrency to your heart's content!
 
 Can't do it without mutable state? Mutable shared data can still be synchronized between concurrent contexts via structures in `std::sync`; high-level abstractions provided by the standard library and, in some rare cases, by library maintainers, have got you covered!
+
+## Aside: Category Theory and Type Theory
+
+The amount of value this adds to a productive Rust experience, or for that matter, any kind of productive programming experience, is very debatable; nonetheless, the maintainers, who are hobbyists in algebra, combinatorics, category theory, and type theory, provide the following resources for the mathematically-inclined.
+
+There is more to category theory and type theory than one could possibly hope to cover in any sane number of asides. The following resources are appropriate for hobbyist mathematicians in this aspect:
+
+1. Category Theory for Programmers, by Bartosz Milewski: This is the golden standard for computer scientists and engineers who are also mathematicians. It provides a high-level overview of categories as _algebraic structures_ with enough exposition that a programmer with some level of knowledge in functional design patterns should be able to follow it. One might, in fact, liken it to Abbott's Real Analysis in terms of writing style. However, there are many subjects intrinsic to category theory, such as _sheaves_ and _abelian categories_, that this does not cover.
+
+2. Categories and Sheaves, by Masaki Kashiwara and Pierre Schapira: This book is not for the light-of-heart; it is intended to _rigorously_ cover category theory, as well as touch on some algebraic topology and homotopic type theory. It is touted as an excellent read for algebraists and engineers with strong mathematical backgrounds.
+
+3. Homotopy Type Theory: Univalent Foundations of Mathematics: This book is intended for algebraists and logicians interested in a characterization of mathematics outside of canonical, i.e. Zermelo-Frankel, set theory. With this, it is possible to achieve succinct formalisms for higher-order logic, which is, albeit tangentially, related to that seen in certain functional programming languages like Haskell and Rust.

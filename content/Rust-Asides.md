@@ -26,13 +26,13 @@ Though this is considered to be idiomatic Java, there are some rather unsavory d
 
 ```java
 try {
-	Instruction args = parse();
+    Instruction args = parse();
 } catch (ThatCustomExceptionForBadUserInputIJustMade tcefbuiijm) {
-	// complain to user or something
+    // complain to user or something
 }
 ```
 
-In general, the idea of "throwing" an "exception" in the middle of the code when something doesn't go the way you want it to, and unwinding the stack until someone catches, is a very object-oriented concept. Indeed, this has its roots in C-style error-handling with signal (did someone say "Segmentation fault (core dumped)"?)
+In general, the idea of "throwing" an "exception" in the middle of the code when something doesn't go the way you want it to, and unwinding the call-stack until someone catches it, is a very object-oriented concept. This has its roots in C-style error-handling with POSIX signals (did someone say "Segmentation fault (core dumped)"?)
 
 A much more succinct model of error-handling is Haskell's [monad](https://www.haskell.org/tutorial/monads.html) construct. Observe the following definition:
 

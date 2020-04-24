@@ -27,7 +27,7 @@ impl<T: Display + Serialize> ToDoList<T> {
 
     pub fn run(&mut self, inst: Instruction<T>) {
         match inst {
-            Instruction::Add(task) => self.tasks.push(task),
+            Instruction::Add(t) => self.tasks.push(t),
             Instruction::Modify(i, t) => self.tasks[i - 1] = t,
             Instruction::Remove(i) => {
                 self.tasks.remove(i - 1);

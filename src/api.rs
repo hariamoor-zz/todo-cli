@@ -21,7 +21,7 @@ impl<T: Display + Serialize> ToDoList<T> {
     pub fn new(name: String) -> ToDoList<T> {
         ToDoList {
             tasks: Vec::new(),
-            name: name,
+            name,
         }
     }
 

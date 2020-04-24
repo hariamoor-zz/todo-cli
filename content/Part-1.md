@@ -124,7 +124,7 @@ The `modify` and `print` operations are left as an exercise to the reader. Note 
 Finally, we address the logic required to query `matches` and return our `Instruction`. Fortunately, this is the most intuitive part: we need only a branch (an if-statement) for each subcommand (case of `Instruction`).
 
 ```rust
-fn parse() -> Option<Instruction> {
+fn parse() -> Result<Instruction, Box<dyn Error>> {
     let matches = clap::App("todo-cli")
     .subcommand(
         SubCommand::with_name("add")
@@ -143,10 +143,15 @@ fn parse() -> Option<Instruction> {
     .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("add") {
-        return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
+		return Ok(Instruction::Add(
+            matches
+                .value_of("NEW")
+                .expect("Need task to add")
+                .to_string(),
+        ));
     } else if let Some(matches) = matches.subcommand_matches("rm") {
-        return Some(Instruction::Remove(
-            matches.value_of("NUM")?.parse().unwrap(),
+		return Ok(Instruction::Remove(
+            matches.value_of("NEW").expect("Need task to add").parse()?,
         ));
     }
     

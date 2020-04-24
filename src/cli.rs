@@ -3,25 +3,24 @@ use clap::clap_app;
 
 pub fn parse() -> Option<Instruction<String>> {
     let matches = clap_app!(todo_cli =>
-                            (version: "0.1")
-                            (author: "USACS at Rutgers University <usacs.rutgers.edu>")
-                            (about: "Simple to-do list CLI in Rust")
-                            (@subcommand print =>
-                             (about: "Print out all values stored in CLI")
-                            )
-                            (@subcommand add =>
-                             (@arg NEW: +required +takes_value "Task to add")
-                             (about: "Add a task to CLI")
-                            )
-                            (@subcommand rm =>
-                             (@arg NUM: +required +takes_value "Identifier of task to remove")
-                             (about: "Remove a task from CLI")
-                            )
-                            (@subcommand modify =>
-                             (@arg NUM: +required +takes_value "Identifier of task to modify")
-                             (@arg NEW: -n --new +required +takes_value "Task number to modify")
-                             (about: "Modify a task stored by the CLI")
-                            )
+        (version: "0.1")
+        (author: "USACS at Rutgers Uo list CLI in Rust")
+        (@subcommand print =>
+            (about: "Print out all values stored in CLI")
+        )
+        (@subcommand add =>
+           (@arg NEW: +required +takes_value "Task to add")
+           (about: "Add a task to CLI")
+        )
+        (@subcommand rm =>
+            (@arg NUM: +required +takes_value "Identifier of task to remove")
+            (about: "Remove a task from CLI")
+        )
+        (@subcommand modify =>
+            (@arg NUM: +required +takes_value "Identifier of task to modify")
+            (@arg NEW: -n --new +required +takes_value "Task number to modify")
+            (about: "Modify a task stored by the CLI")
+        )
     )
     .get_matches();
 

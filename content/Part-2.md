@@ -1,9 +1,3 @@
-<!---
-Needed asides:
-- 3-tier architecture and applications outside of webdev
-- Problems with serialization in other languages - how Serde aims to solve them in Rust
--->
-
 # Serializing Application State to Disk
 
 In this, our second, week, we'll proceed to modeling our persistent-state. Here, we develop the app's "backend", which provides an API of some sort for the "frontend" to interact with to serve the users.
@@ -25,6 +19,8 @@ In order to effectively represent our memory in a way that it can be stored on d
 At a high level, once we know that the user is finished interacting with the to-do list, e.g. when it is scheduled by the Rust compiler to be freed from memory, we can serialize it and write to disk. Similarly, once we know that the user wants to once again interact with the to-do list, we load it from disk and _deserialize_ it back into the original format.
 
 The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore.
+
+For more information on `serde-rs`, please see the [pertinent aside](Rust-Asides.md).
 
 ## Setting Up
 
@@ -107,7 +103,7 @@ Much less trivial is the `run` function. Here, we print the to-do list using the
 hamoor's To-Do List:
 
 +---+-------------+
-| 1 | New task    |
+| 1 | First task  |
 +---+-------------+
 | 2 | Second task |
 +---+-------------+

@@ -19,7 +19,7 @@ pub enum BinaryTree<T> {
 }
 ```
 
-If you read `Box` as "pointer to", you may recognise a binary tree structure. Such recursive trees are broadly applicable as parts of finite state machines or programming language parse trees. But there's more! These structures arise in a confluence of catagory theory and type theory while appearing in useful code.
+If you read `Box` as "pointer to", you may recognise a binary tree structure. Such recursively-defined trees are broadly applicable as parts of finite state machines or programming language parse trees. But there's more! These structures arise in a confluence of category theory and type theory, while appearing in useful code.
 
 This appears under various names in various languages. In particular:
 
@@ -33,7 +33,7 @@ This appears under various names in various languages. In particular:
 
 The above structure where `.` are chained to form a representation of some data and then a final `.get` function converts or uses the representation, providing a more useful form to the user of the library. This is a useful pattern for libraries to expose complicated and flexible functions while staying legible its to users.
 
-Here is a [Java-based tutorial](https://www.geeksforgeeks.org/builder-design-pattern/) and here is [a boarder tutorial](https://refactoring.guru/design-patterns/builder).
+We supply a [Java-based tutorial](https://www.geeksforgeeks.org/builder-design-pattern/) for those with OOP backgrounds and [a boarder tutorial](https://refactoring.guru/design-patterns/builder) to address the general case.
 
 ## Aside: Parallelism and Functional Programming
 

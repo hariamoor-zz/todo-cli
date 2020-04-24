@@ -22,10 +22,4 @@ pub(crate) fn main() -> Result<(), Box<dyn Error>> {
     };
 
     Ok(list.run(parse()?))
-    // match parse() {
-    //     Some(inst) => list.run(inst),
-    //     None => panic!("Arguments could not be parsed"),
-    // }
-
-    // Ok(())
 }

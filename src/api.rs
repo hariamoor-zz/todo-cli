@@ -65,6 +65,7 @@ pub enum Instruction<T> {
     Print,
 }
 
+#[cfg(test)]
 mod tests {
     use super::{Instruction, ToDoList};
 

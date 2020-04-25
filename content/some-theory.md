@@ -2,6 +2,15 @@
 
 This is a opinionated lay of the land, explaining the scenery around which Rust has been built. Rust has not been created in a vacuum and knowing the ideas that existed before should guide people, hopefully, to two things: better ideas, and an ability to accept steady change.
 
+First, here are a lot of links to readings the maintainers have generally used to in developing their views on the theoretical aspects expounded here.
+
+| Link | Type | Why this is here |
+|---|---|---|
+| [Awodey's Category Theory](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.211.4754&rep=rep1&type=pdf) | Textbook | This is a lot of the mathematics we discuss on the ADTs and we do borrow words from category theory here and there. |
+| [Simon Peyton Jones on the development of Haskell](https://youtu.be/re96UgMk6GQ) | Talk | This explains the ideas that founded Haskell. These ideas are ranted against or begged for in various places all over the tutorial. |
+| [Bjarne Stroustrup on Modern C++](https://youtu.be/86xWVb4XIyE) | Talk | The whole talk is great, but there is an excellent bunch of [slides on move semantics](https://youtu.be/86xWVb4XIyE?t=2411 "This is an approximate timestamp.") in the middle that are the reason to include it here. |
+| [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html) | Textbook | The book is an eye-opening introduction to programming and it steadily builds a model of programming that can be very inspirational. [This section](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.3) is the [traditional programming model](#rust-uses-linear-types) mentioned below. |
+
 So, the landscape.
 
 ## Simon Peyton Jones' Graph of Languages

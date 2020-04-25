@@ -57,7 +57,7 @@ In general, this is a much more succinct pattern for error-handling. In cases wh
 
 How? Haskell's `Result` type (more broadly named `Either` has a `Monad` instance).
 
-Idiomatic Rust follows a very similar system; the `Result` and `Option` types are isomorphic to trivially-defined monads in Haskell (said isomorphism is seen in the `and_then` function in Rust and the `Ok` and `Some` constructors, more on why this isomorphism is up to various finicky details is provided in our lengthy discussion on the underlying mathematics [here](some-theory.md#rust-and-hkts "There's also some bitching about the notion of Monads if you didn't like this section.")). In general, it is considered unsavory to `panic!`, especially explicitly. You either propagate the error up the stack or manually address it; however, if you don't want to do either of those things, there is also an `.unwrap()` function that returns the underlying type or `panic!`s internally.
+Idiomatic Rust follows a very similar system; the `Result` and `Option` types are isomorphic to trivially-defined monads in Haskell (said isomorphism is seen in the `and_then` function in Rust and the `Ok` and `Some` constructors, more on why this isomorphism is up to various finicky details is provided in our lengthy discussion on the underlying mathematics [here](some-theory.md#rust-and-hkts-and-gadts "There's also some bitching about the notion of Monads if you didn't like this section.")). In general, it is considered unsavory to `panic!`, especially explicitly. You either propagate the error up the stack or manually address it; however, if you don't want to do either of those things, there is also an `.unwrap()` function that returns the underlying type or `panic!`s internally.
 
 ### Aside in the Aside: Similarity to the Ubiquitous `null` type
 
@@ -110,6 +110,8 @@ This Rust API for serialization is generally considered more _expressive_ than t
 Who the fuck goes to production with Haskell, in the first place...?
 
 Well, that's not really an argument, if Haskell were doing the right thing. Fortunately, we have avoided having to recant: `Data.Serialize` is a lot like the Boost system that exists for C++. The key difference is that the serialization contract is explicit, but it is messier as it lifts the `Builder` monad to form a custom serialization monad. Not only that, the serialization monad provided in Haskell isn't very extensible; see that most serialization libraries are implemented without using `Data.Serialize`.
+
+(Haskell's implementation lifts the `Builder` monad to have stateful buffers that can be edited without copying the entire string to retain purity. This is a way to improve the efficiency of the serialization.)
 
 ## Aside: The Layout of a Rust Application
 

@@ -1,6 +1,6 @@
 # Serializing Application State to Disk
 
-In this, our second week, we'll proceed to modeling our persistent-state. Here, we develop the app's "backend", which provides an API of some sort for the "frontend" to interact with to serve the users. [Here's an aside explaining this analogy.](General-Asides#aside-3-tiered-architectures "Miraculous that you should care.")
+In this, our second week, we'll proceed to modeling our persistent-state. Here, we develop the app's "backend", which provides an API of some sort for the "frontend" to interact with to serve the users. [Here's an aside explaining this analogy.](General-Asides.md#aside-3-tiered-architectures "Because, obviously, the best metaphors are explained in lengthy asides.")
 
 ## Strategies for Managing Application State
 
@@ -18,9 +18,7 @@ In order to effectively represent our memory in a way that it can be stored on d
 
 At a high level, once we know that the user is finished interacting with the to-do list, e.g. when it is scheduled by the Rust compiler to be freed from memory, we can serialize it and write to disk. Similarly, once we know that the user wants to once again interact with the to-do list, we load it from disk and _deserialize_ it back into the original format.
 
-The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore. For more on how serde compares with competitors, [see this aside](Rust-Asides#aside-serialization "Wherein we just gloat about Rust being cooler than us.").
-
-For more information on `serde-rs`, please see the [pertinent aside](Rust-Asides.md).
+The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore. For more on how serde compares with competitors, [see this aside](Rust-Asides.md#aside-serialization "Wherein we just gloat about Rust being cooler than us.").
 
 ## Setting Up
 

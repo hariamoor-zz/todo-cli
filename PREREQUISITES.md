@@ -10,7 +10,7 @@ several other concepts:
 
 -   Memory management at compile-time, i.e. in C/C++
     -   Ideally with C++ STL abstractions - the Rust borrow checker is
-        very similar)
+        very similar
 -   Basic type theory for metaprogramming - a big part of Rust
     -   Algebraic data types
     -   Higher-kinded types

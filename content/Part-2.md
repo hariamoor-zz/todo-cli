@@ -20,6 +20,8 @@ At a high level, once we know that the user is finished interacting with the to-
 
 The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore. For more on how serde compares with competitors, [see this aside](Rust-Asides#aside-serialization "Wherein we just gloat about Rust being cooler than us.").
 
+For more information on `serde-rs`, please see the [pertinent aside](Rust-Asides.md).
+
 ## Setting Up
 
 Fortunately, Cargo takes care of most of this for us; we simply need to specify in the configuration file `Cargo.toml` that the crates `serde-rs` and `serde_json` (we'll be storing our list in [the ubiquitous JSON format](https://en.wikipedia.org/wiki/JSON)) needs to be available at build-time; it takes care of the actual downloading on our behalf.
@@ -101,7 +103,7 @@ Much less trivial is the `run` function. Here, we print the to-do list using the
 hamoor's To-Do List:
 
 +---+-------------+
-| 1 | New task    |
+| 1 | First task  |
 +---+-------------+
 | 2 | Second task |
 +---+-------------+

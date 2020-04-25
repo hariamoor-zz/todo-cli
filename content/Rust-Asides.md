@@ -16,13 +16,13 @@ Macros can also help inform the future of the language. The `?` we used above ac
 
 ## Aside: Good Error Handling
 
-Suppose you were writing this in perfect, code reviewed Java.
+Consider the following pristine Java code:
 
 ```java
 public static Instruction parse() throws ThatCustomExceptionForBadUserInputIJustMade {}
 ```
 
-Now, there's a few interesting issues. In particular a caller would have to write:
+Though this is considered to be idiomatic Java, there are some rather unsavory details we see here. In particular, the onus is on the developer to remember which functions can result in thrown exceptions, and which of those exceptions to catch, i.e. with a `try-catch` block such as the following:
 
 ```java
 try {
@@ -32,9 +32,26 @@ try {
 }
 ```
 
-Technically, this is a new control flow operation. `args` lives in its own scope. Finding the right bit of code that catches the exception is hard. These complications are not *huge* slowdowns, but they complicate the mental model of functions. Functions can two one of two things: return a value, or barf loudly. In Rust, this is simpler, but the only escape hatch is `panic!`ing which is generally avoided, and functions always return something.
+In general, the idea of "throwing" an "exception" in the middle of the code when something doesn't go the way you want it to, and unwinding the call-stack until someone catches it, is a very object-oriented concept. This has its roots in C-style error-handling with POSIX signals (did someone say "Segmentation fault (core dumped)"?)
 
-As mentioned above, the standard library has two error-reporting types: `Option` if you don't care to tell callers what failed and `Result` if you do.
+A much more succinct model of error-handling is Haskell's [monad](https://www.haskell.org/tutorial/monads.html) construct. Observe the following definition:
+
+```haskell
+infixl 1  >>, >>=
+class Monad m  where
+    (>>=)            :: m a -> (a -> m b) -> m b
+    (>>)             :: m a -> m b -> m b
+    return           :: a -> m a
+    fail             :: String -> m a
+
+    m >> k           =  m >>= \_ -> k
+```
+
+For the uninitiated, the above is absolute gibberish; however, in essence, Haskell provides a generic type called `Monad` defined by (1) a generic type `a`, and; (2) functions called `bind` and `return`. The `bind` function applies another monadic transformation respecting the same monad `m` iff `a` is valid, and the `return` function "unwraps" `a` so that it can be used as a normal value.
+
+In general, this is a much more succinct pattern for error-handling. In cases where you want to bother the user (which, for small applications such as this one, is most of them), it DWIMs and propagates the error, defined here as a `String`, up the call stack. On the other hand, if the developer wants to explicitly handle the error, he may do so with Haskell's pattern-matching syntax.
+
+Idiomatic Rust follows a very similar system; the `Result` and `Option` types are isomorphic to trivially-defined monads in Haskell. In general, it is considered unsavory to `panic!`, especially explicitly. You either propagate the error up the stack or manually address it; however, if you don't want to do either of those things, there is also an `.unwrap()` function that returns the underlying type or `panic!`s internally.
 
 ### Aside in the Aside: Similarity to the Ubiquitous `null` type
 
@@ -48,15 +65,15 @@ The `None` enumeration in Rust's `Option` type, on the other hand, is a very dif
 
 Yay! We have a type. The issue, however, with types, is that they can be slower to manage after the code is compiled. After all, in C, bare pointers are tiny -- fitting in registers. But what about some `Option` thing? What's its size?
 
-Here, the Rust compiler has a trick up its sleave: if your type is like a pointer, rust will compile the matches against an `Option` to the nullity check that the good C programmer would've written. (So the Rustecean from the aside above is right in some cases, and in a literal sense.)
+Here, the Rust compiler has a trick up its sleeve; if the underlying type implements the `Deref` trait, i.e. it's "like" a pointer, then this idiomatic Rust code compiles to what the equivalent C code that applies a null-check would.
 
-This is a general principle in Rust: a lot of safer and elegant parts of the code actually come at no runtime cost. There is one other classic example Rusteceans use to gloat: the memory safety comes at no cost -- to the programmer or the compiled program.
+This is a rather useful pattern in Rust: a lot of safer and elegant parts of the code actually come at no runtime cost.
 
 ## Aside: Bindings
 
 The way to make variables in rust is to use `let`. However, it does more than that. This has to do with a broader notion called [pattern matching](https://en.wikipedia.org/wiki/Pattern_matching).
 
-Rust uses pattern matching in various cases -- here is the [chapter in the Rust book](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) that describes this. `let` bindings can use a special type of pattern matching called [destructuring](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-to-break-apart-values).
+Rust uses pattern matching in various cases -- see the associated [chapter in the Rust book](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html) that describes this. `let` bindings can use a special type of pattern matching called [destructuring](https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-to-break-apart-values).
 
 Some destructuring will always work: a `struct` (or object) can be destructured into its fields, a tuple (fixed length list if you need an analogy) can be destructured into its contents. Rust calls this an irrefutable binding.
 
@@ -82,13 +99,11 @@ With Rust and `serde-rs`, however, you have a much more strict and well-defined 
 
 This Rust API for serialization is generally considered more _expressive_ than that provided by the Boost framework in C++; this is because, while you can serialize/deserialize objects in C++ as you can in Rust, the contracts you must fulfill for custom formatting is less clear (since C++ templates are not as expressive as Rust's traits). Furthermore, the C++ libraries for serialization are not as all-encompassing as serde: there is no one library (known to the authors) that serializes into all the formats that serde does.
 
-### Haskell's `Data.Serialize`
+### Haskell's Serialization with `Data.Serialize`
 
 Who the fuck goes to production with Haskell, in the first place...?
 
-Well, that's not really an argument, if Haskell were doing the right thing. Fortunately, we have avoided having to recant: `Data.Serialize` is a lot like the Boost system that exists for C++. The key difference is that the serialization contract is explicit, but it is messier as it lifts the `Builder` monad to form a custom serialization monad.
-
-`Data.Serialize` is also not as complete as serde, lacking any in-built support for the variety of formats serde does.
+Well, that's not really an argument, if Haskell were doing the right thing. Fortunately, we have avoided having to recant: `Data.Serialize` is a lot like the Boost system that exists for C++. The key difference is that the serialization contract is explicit, but it is messier as it lifts the `Builder` monad to form a custom serialization monad. Not only that, the serialization monad provided in Haskell isn't very extensible; see that most serialization libraries are implemented without using `Data.Serialize`.
 
 ## Aside: The Layout of a Rust Application
 

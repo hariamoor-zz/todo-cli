@@ -24,7 +24,7 @@ We also recommend the [cargo-edit](https://docs.rs/cargo-edit/0.6.0/cargo_edit/)
 
 The clap-rs crate provides numerous ways to specify the procedure for a CLI; at time of writing, our options include native Rust objects, macros supplied with the package itself, and a separate YAML file.
 
-todo-cli must support, at minimum, the CRUD (Create Read Update Delete) API. Thus, the core logic we design next week should be based on some kind of data type that can tell us which instruction to process. Fortunately, we can do this rather simply with an [enum](https://doc.rust-lang.org/stable/rust-by-example/custom_types/enum.html) type. If you want to know more about where these come from see our [aside on sum types](general-asides#aside-sum-types).
+todo-cli must support, at minimum, the CRUD (Create Read Update Delete) API. Thus, the core logic we design next week should be based on some kind of data type that can tell us which instruction to process. Fortunately, we can do this rather simply with an [enum](https://doc.rust-lang.org/stable/rust-by-example/custom_types/enum.html) type. If you want to know more about where these come from see our [aside on sum types](General-Asides.md).
 
 ```rust
 pub enum Instruction {
@@ -72,9 +72,9 @@ fn parse() -> Option<Instruction> {
 }
 ```
 
-Now, we handle errors safely by returning `Some(Instruction)` if the function succeeds and `None` otherwise. You can read more about error handling in rust in a [dedicated aside](rust-asides#aside-good-error-handling).
+Now, we handle errors safely by returning `Some(Instruction)` if the function succeeds and `None` otherwise. You can read more about error handling in rust in a [dedicated aside](Rust-Asides.md).
 
-A finalized CLI parser for todo-cli, written using the `clap::clap_app` macro provided in clap-rs, is supplied [here](https://github.com/hariamoor/todo-cli/blob/b574ad84b5bae1a4c9ebce3780972884339e7cb0/src/main.rs#L27-L46). To read more on macros, see [this aside](rust-asides#aside-macros-in-rust).
+A finalized CLI parser for todo-cli, written using the `clap::clap_app` macro provided in clap-rs, is supplied [here](https://github.com/hariamoor/todo-cli/blob/b574ad84b5bae1a4c9ebce3780972884339e7cb0/src/main.rs#L27-L46). To read more on macros, see [this aside](Rust-Asides).
 
 ## Step 2: Implementation
 
@@ -119,12 +119,12 @@ let matches = clap::App("todo-cli")
     .get_matches();
 ```
 
-The `modify` and `print` operations are left as an exercise to the reader. Note that the pattern above is a universal design pattern -- here's a [brief aside](general-asides#aside-the-builder-pattern).
+The `modify` and `print` operations are left as an exercise to the reader. Note that the pattern above is a universal design pattern -- here's a [brief aside](General-Asides.md).
 
 Finally, we address the logic required to query `matches` and return our `Instruction`. Fortunately, this is the most intuitive part: we need only a branch (an if-statement) for each subcommand (case of `Instruction`).
 
 ```rust
-fn parse() -> Option<Instruction> {
+fn parse() -> Result<Instruction, Box<dyn Error>> {
     let matches = clap::App("todo-cli")
     .subcommand(
         SubCommand::with_name("add")
@@ -143,10 +143,15 @@ fn parse() -> Option<Instruction> {
     .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("add") {
-        return Some(Instruction::Add(matches.value_of("NEW")?.to_string()));
+		return Ok(Instruction::Add(
+            matches
+                .value_of("NEW")
+                .expect("Need task to add")
+                .to_string(),
+        ));
     } else if let Some(matches) = matches.subcommand_matches("rm") {
-        return Some(Instruction::Remove(
-            matches.value_of("NUM")?.parse().unwrap(),
+		return Ok(Instruction::Remove(
+            matches.value_of("NEW").expect("Need task to add").parse()?,
         ));
     }
     
@@ -154,7 +159,7 @@ fn parse() -> Option<Instruction> {
 }
 ```
 
-The above code is a complete parser for the `add` and `rm` options; extending it to support `modify` and `print` is left as an exercise to the reader. If the uses of `let`, especially an `if let` are new to you, [here's an aside](rust-asides#aside-bindings).
+The above code is a complete parser for the `add` and `rm` options; extending it to support `modify` and `print` is left as an exercise to the reader. If the uses of `let`, especially an `if let` are new to you, [here's an aside](Rust-Asides.md).
 
 ## Step 3: Testing
 
@@ -170,4 +175,4 @@ Why did the open-source community decide that this was a necessity when they bui
 
 For that matter, who _are_ Rust's predecessors? Some would consider the target runtime and argue that Rust was designed as a safer version of C or C++, while others would consider the type system and argue that it's supposed to be a faster and more boardly usable Haskell. A third subset might even see Rust as a successor to Python or JavaScript. Are any of them _objectively_ right or wrong? Or will Rust continue to defy our attempts to classify it as the successor to any one particular language?
 
-Also, will this go a week without name-dropping catagory theory? How deeply nested will the asides be?
+Also, will this go a week without name-dropping category theory? How deeply nested will the asides be?

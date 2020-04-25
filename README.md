@@ -10,6 +10,8 @@ UPDATE: [Part 2 now available](content/Part-2.md)
 
 To best follow the tutorials, look at the markdown write-ups above and the source code under the `src/` directory. The `cli.rs` file is part 1 and the other two files are part 2. The `Cargo.toml` file in this directory will also be mentioned and modified, but you can also take ours as-is for simplicity (we detail how it should be manipulated in our markdown).
 
+It is supplied as reference material and, in some cases, uses advanced Rust techniques (such as Lisp-like ad-hoc macro dialects) to provide more succinct code. This is not to recommend it as the only way to do this -- just one of a few good ways.
+
 Why Rust?
 ---------
 
@@ -53,8 +55,8 @@ Tutorial Format
 This will be a two-part online tutorial where, in each week, we
 produce some usable and testable component of software.
 
-Week 1 will focus on setting up the CLI with clap and representing the
-application state with Rust\'s data structures. Finally, in Week 2, we will
+Part 1 will focus on setting up the CLI with clap and representing the
+application state with Rust\'s data structures. Finally, in Part 2, we will
 serialize and deserialize our application state (tasks in our to-do
 list) to disk.
 

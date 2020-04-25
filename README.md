@@ -43,7 +43,7 @@ official website.
 This tutorial assumes that the user is setup with Cargo, Rustup, and an
 IDE/editor of his/her choice. Please refer to the Rust website or
 contact the maintainer(s) if any more clarification is necessary. Rust
-is very flexible is supporting a variety of general-purpose editors, so
+is very flexible in supporting a variety of general-purpose editors, so
 if you enjoy crafting your tool to fit only your hand, look out for a Rust
 plugin for your editor or IDE.
 

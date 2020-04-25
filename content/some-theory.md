@@ -145,6 +145,8 @@ Rust has this distinction: it is very unlikely to have a memory error in safe co
 
 Hence, simply, C++ is fast but dangerous.
 
+The other issue is that templates are not as up-front about the theorem they seek to state. Like [any impl is a theorem](#impls-as-theorems), we'd like templated functions to be theorems, but the complier doesn't actually prove statements about the function being defined until the template is instantiated. [C++20 concepts](https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)) are a fix for some of this issue, but don't actually turn function bodies into proofs yet.
+
 ### Rant about Haskell
 
 Haskell is harder to want to rant about, ["avoiding success at all costs,"](https://youtu.be/re96UgMk6GQ?t=715 "A bit more than needed, but Simon Peyton Jones is a personal hero, so ignore me and watch his talks.") it does not have the goals that Rust does. In fact, none of these complaints should tell a Haskell developer to necessarily bother with Rust. It depends on their goals -- in particular: do they care about speed?

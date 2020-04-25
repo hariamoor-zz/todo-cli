@@ -36,7 +36,7 @@ pub fn parse() -> Result<Instruction<String>, Box<dyn Error>> {
         ));
     } else if let Some(matches) = matches.subcommand_matches("rm") {
         return Ok(Instruction::Remove(
-            matches.value_of("NEW").expect("Need task to add").parse()?,
+            matches.value_of("NUM").expect("Need index of task to remove").parse()?,
         ));
     } else if let Some(matches) = matches.subcommand_matches("modify") {
         return Ok(Instruction::Modify(

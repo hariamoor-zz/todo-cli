@@ -9,6 +9,7 @@ So, the landscape.
 Simon Peyton Jones has a graph he likes to use as a mental model for programming languages. So far, this chart holds true, particularly with today's trends. We have:
 
 | Case | Unsafe | Safe |
+|---|---|---|
 | Fast | C, C++ | (Almost) Rust |
 | Slow | N/A | Haskell |
 
@@ -93,7 +94,7 @@ This puts us in even better shape for saying general things about our model of t
 
 The above are the concepts Rust fully implements. This section is to mention somethings that remain.
 
-We talk [about sum types](General-Asides.md#aside-sum-types) at length. Product types are structs or tuples. These are fully implemented by Rust and are called **A**glebraic **D**ata **T**ypes. Here we will extend them some.
+We talk [about sum types](General-Asides.md#aside-sum-types) at length. Product types are structs or tuples. These are fully implemented by Rust and are called **A**lgebraic **D**ata **T**ypes. Here we will extend them some.
 
 In particular, what is a `ToDoList<T>`? It's not just the product of some `Vec<T>` and a `String`. For all `T`, the `ToDoList<T>` is a separate type (each perhaps with its own properties). To generalize this, we look into HKTs.
 
@@ -184,4 +185,38 @@ impl<A: Nat> Nat for SNat<A> {
 }
 ```
 
-So GADTs are just weaker and messier in Rust, but not inaccessible per say.
+So GADTs are just weaker (since the lack of good HKTs limits them) and messier in Rust, but not inaccessible per say.
+
+### Rust Uses Linear Types
+
+The above sections are one approach to building programming languages from mathematical foundations. In particular, they look at type theory to form a full logical system and explore some of the semantics therein.
+
+This is not really the most traditional logical system, though, and can get rather confusing in practice: if types become dependent, how do we know what values are parts of dependent types and what values or actually used by the runtime. If we care about allocation, where are we allocating the data needed to execute branches based on the various types? How are we actually modelling I/O, memory, and state changes? These questions become critical in a complete discussion of programming, and type theory is not the only way to think about it.
+
+In particular, we can build the language from the ground up: we define a syntax as a set of rules telling us what can go where (you would be familiar with these even though it's rare to see them fully written out for a modern programming language -- one tends to learn them by breaking them nowadays). Then, given a well-formed statement in the language, a set of re-write rules can define everything about how to evaluate the programming language. They re-write memory in abstract computers to describe state, so that the underlying mathematics can be stateful if desired.
+
+There is a little more to this model of semantics. In fact, it can be empowered by changing the predicates used. For instance, consider the following Rust:
+
+```rust
+let x: NonCopyableType; // just assume there is some default
+f(x, x);
+```
+
+This doesn't work: `x` is used after it's moved into `f`. In normal (copy-based or reference-based) semantics, this is fine, but Rust doesn't use this commonplace system. To understand Rust's logical system, it is worth knowing [linear logic](https://en.wikipedia.org/wiki/Linear_logic). This is a part of why Rust is so elegantly safe. It uses a semantic system that is more closely tied to a performant model of memory use. I will let you wrestle the borrow checker to understand Rust's model of linear logic.
+
+### Monads Explained
+
+This is an alternative short explanation on what, practically, a Monad is. We have brought them up earlier, but this section is in the abstract.
+
+A Monad is a wrapper of your type with the state of the whole world. This is a way of modelling how Monads create state. They don't: you just make a new world where your state changes have happened each time you use them. Here is how the two functions we mentioned work with this:
+
+- Return: this puts your variable next to a world state. It's you labelling the status quo with your data so that you know how to deal with it later.
+- Bind: (recall the signature `m a -> (a -> m b) -> m b`). This lets you change states. It gives you the current label from the world state and lets you run a function on from that label to a new world state. It then spits out the new world state.
+
+OK, this doesn't mean that the Haskell compiler is omniscient. This is a metaphor for what's going on. The metaphor is more literally used in Modal Logic which is the system programming languages may come to care about to reason about stateful code with various dependencies on the real world.
+
+If you know the category theory mantra:
+
+> A monad is just a monoid in the category of endofunctors.
+
+The analogy would be that moving along the endofunctor is changing the world state since that is what the `bind` function we use corresponds to. Return is the identity element of the monoid and doesn't change the world.

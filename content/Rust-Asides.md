@@ -32,7 +32,11 @@ try {
 }
 ```
 
-In general, the idea of "throwing" an "exception" in the middle of the code when something doesn't go the way you want it to, and unwinding the call-stack until someone catches it, is a very object-oriented concept. This has its roots in C-style error-handling with POSIX signals (did someone say "Segmentation fault (core dumped)"?)
+In general, the idea of "throwing" an "exception" in the middle of the code when something doesn't go the way you want it to, and unwinding the call-stack until someone catches it. This has its roots in C-style error-handling with POSIX signals (did someone say "Segmentation fault (core dumped)"?). This is a more complex model as functions suddenly have two types of exits.
+
+Rust makes it simpler through the option and result types: you merely return the errors and the compiler checks that you check for the errors since you'd otherwise have a type mistmach (or you'd explicitly `unwrap` the error to ignore it).
+
+### Aside in the Aside: Monads as a Generalization of the Above
 
 A much more succinct model of error-handling is Haskell's [monad](https://www.haskell.org/tutorial/monads.html) construct. Observe the following definition:
 
@@ -47,11 +51,13 @@ class Monad m  where
     m >> k           =  m >>= \_ -> k
 ```
 
-For the uninitiated, the above is absolute gibberish; however, in essence, Haskell provides a generic type called `Monad` defined by (1) a generic type `a`, and; (2) functions called `bind` and `return`. The `bind` function applies another monadic transformation respecting the same monad `m` iff `a` is valid, and the `return` function "unwraps" `a` so that it can be used as a normal value.
+For the uninitiated, the above is absolute gibberish; however, in essence, Haskell provides a generic type called `Monad` defined by (1) a generic type `a`, and; (2) functions called `bind` and `return`. The `bind` function (written `>>=`, said to form the Haskell logo) applies another monadic transformation respecting the same monad `m` iff `a` is valid, and the `return` function "unwraps" `a` so that it can be used as a normal value.
 
-In general, this is a much more succinct pattern for error-handling. In cases where you want to bother the user (which, for small applications such as this one, is most of them), it DWIMs and propagates the error, defined here as a `String`, up the call stack. On the other hand, if the developer wants to explicitly handle the error, he may do so with Haskell's pattern-matching syntax.
+In general, this is a much more succinct pattern for error-handling. In cases where you want to bother the user (which, for small applications such as this one, is most of them), it DWIMs (**D**oes **W**hat **I** **M**ean (ok, ostensibly what _you_ mean)) and propagates the error, defined here as a `String`, up the call stack. On the other hand, if the developer wants to explicitly handle the error, he may do so with Haskell's pattern-matching syntax.
 
-Idiomatic Rust follows a very similar system; the `Result` and `Option` types are isomorphic to trivially-defined monads in Haskell. In general, it is considered unsavory to `panic!`, especially explicitly. You either propagate the error up the stack or manually address it; however, if you don't want to do either of those things, there is also an `.unwrap()` function that returns the underlying type or `panic!`s internally.
+How? Haskell's `Result` type (more broadly named `Either` has a `Monad` instance).
+
+Idiomatic Rust follows a very similar system; the `Result` and `Option` types are isomorphic to trivially-defined monads in Haskell (said isomorphism is seen in the `and_then` function in Rust and the `Ok` and `Some` constructors, more on why this isomorphism is up to various finicky details is provided in our lengthy discussion on the underlying mathematics [here](some-theory.md#rust-and-hkts "There's also some bitching about the notion of Monads if you didn't like this section.")). In general, it is considered unsavory to `panic!`, especially explicitly. You either propagate the error up the stack or manually address it; however, if you don't want to do either of those things, there is also an `.unwrap()` function that returns the underlying type or `panic!`s internally.
 
 ### Aside in the Aside: Similarity to the Ubiquitous `null` type
 
@@ -154,10 +160,8 @@ Firstly, a bit of philosophy:
 
 So? The first thing is that every `filename.rs` is implicitly in a module `filename`. But there's more! Rust has a module keyword so you can nest as much as you'd like with just one file. `pub` makes things public because everything is private by default (yay, encapsulation!). Hence, you'll see that our `cli.rs` opens with `pub mod cli {`.
 
-In order to use modules elsewhere, you need to `use` them. This also has a couple edge cases:
+In order to use modules elsewhere, you need to `use` them. This also has an edge case: if the module is another file in your application, you have to declare it with `mod filename;` in your `main.rs`.
 
-- If the module is another file in your application, you have to declare it with `mod filename;` in your `main.rs`.
-- If the module is from a crate you're depending on, you have to forward-declare it with `extern crate toplevel_name_of_crate;`.
 
 To use your own modules from your application in your application, note that you have to `use crate::<module path>`. Inner modules are referred to after the `::`. All these edge cases appear in our `main.rs`.
 
@@ -169,3 +173,16 @@ These blocks implement functions on data types. These are the methods in Java. T
 - impl trait
 
 A standalone `impl` block reads `impl <type> {` and in the block, you list out methods and implement them. These will be the methods your object can use. `self` is a magic keyword in the block that refers to the instance of the object you're calling the method on (if it's absent, the method is like a static function in Java or C++). `Self` is a magic keyword for the type that you're implementing methods for.
+
+Impls are powerful statements about code, as explained in [our math writeup](some-theory.md#impls-as-theorems).
+
+### Aside in the Aside: Functions
+
+These are the only parts that can contain executed code (the rest of the blocks being (arguably) mere data). OF course, the [Rust book](https://doc.rust-lang.org/beta/book/ch03-03-how-functions-work.html) is more thorough.
+
+We just note a handful of salient features:
+
+- Like in Ruby, `return` values can implicitly be the last evaluated expression's value.
+- There is no function overloading (traits can be used if needed).
+- The return type need not be "concrete" (it can be an opaque instance of an interface and the compiler does do this to support safe multi-threading).
+- Functions are private to the module unless they are prefixed by `pub` (like the struct, enum, and trait declarations that we omit -- enums and structs appear in the tutorial and trait declarations are beyond the scope of this tutorial).

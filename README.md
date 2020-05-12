@@ -10,7 +10,7 @@ UPDATE: [Part 2 now available](content/Part-2.md)
 
 It is necessary, and in some cases, recommended, to view the source code paired with this tutorial. It is supplied as reference material and, in some cases, uses advanced Rust techniques (such as Lisp-like ad-hoc macro dialects) to provide more succinct code.
 
-While one should be able to follow and implement the almost all the code supplied in the tutorial without it, it is intended as a reference for what idiomatic Rust code should look like.
+One should be able to follow and implement the almost all the code supplied in the tutorial without it. With that said, it is intended as a reference for what idiomatic Rust code should look like.
 
 Why Rust?
 ---------

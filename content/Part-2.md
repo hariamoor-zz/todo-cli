@@ -40,7 +40,6 @@ pub enum Instruction {
 ```
 
 <!-- However, we must first ask ourselves; when and why did we assume that each task would be stored as a string? It would indeed be convenient if that's all we needed to store, but what if we wanted to also store a due date at some point in the future? What if we wanted to expand our definition of what a task in our to-do list looks like? -->
-
 We first ask ourselves: why does our identifier _have to_ be a string? Why not a `struct`? Why not an arbitrary type, as long as you can serialize it and print it to the console?
 
 In software, rapidly changing requirements are all too common. In general, we'd like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this use case idiomatically. We add a _parametriized generic type_ as follows:

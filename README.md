@@ -10,7 +10,7 @@ UPDATE: [Part 2 now available](content/Part-2.md)
 
 To best follow the tutorials, look at the markdown write-ups above and the source code under the `src/` directory. The `cli.rs` file is part 1 and the other two files are part 2. The `Cargo.toml` file in this directory will also be mentioned and modified, but you can also take ours as-is for simplicity (we detail how it should be manipulated in our markdown).
 
-It is supplied as reference material and, in some cases, uses advanced Rust techniques (such as Lisp-like ad-hoc macro dialects) to provide more succinct code. This is not to recommend it as the only way to do this -- just one of a few good ways.
+One should be able to follow and implement the almost all the code supplied in the tutorial without it. With that said, it is intended as a reference for what idiomatic Rust code should look like.
 
 Why Rust?
 ---------

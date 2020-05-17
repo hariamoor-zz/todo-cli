@@ -4,27 +4,27 @@ In this, our second week, we'll proceed to modeling our persistent-state. Here, 
 
 ## Strategies for Managing Application State
 
-Computers generally provide two kinds of memory for users to generically manage their application state - volatile and persistent memory.
+Generally, there are two kinds of memory you can use to model application state - volatile and persistent memory.
 
-The former is usually implemented with a small disk device that interfaces with the CPU via a communication medium known as a _bus_; this is what we generally know today as RAM. This kind of memory is generally ideal for CPU-intensive computation with a relatively small amount of state to keep track of. However, it is _volatile_ in that it is associated with operating-system level, i.e. Unix, [processes](https://heather.cs.ucdavis.edu/~matloff/UnixAndC/Unix/Processes.pdf); the operating system cannot guarantee that a program's application state will be preserved in volatile memory after its process terminates. Thus, volatile memory is insufficient for our task of having our app _save_ the the to-do list for later use.
+The former is usually implemented with a small disk device that interfaces with the CPU via a communication medium known as a _bus_; this is what we generally know today as RAM. This kind of memory is ideal for CPU-intensive computation with a relatively small amount of state to keep track of. However, it is _volatile_ in that it is associated with operating-system level, i.e. Unix, [processes](https://heather.cs.ucdavis.edu/~matloff/UnixAndC/Unix/Processes.pdf). A program's application state will, in general, *not* be preserved in volatile memory after its process terminates. Thus, volatile memory is insufficient for our current task; we wouldn't be able to _save_ the the to-do list for later use.
 
-Instead, we use persistent memory, i.e. in a hard disk, to store our to-do list. While this is intrinsically slower than volatile memory in general, it can guarantee that our content will be preserved for as long as we need.
+Instead, we use persistent memory, i.e. in a hard disk. While this is intrinsically slower than volatile memory in general, it can guarantee that our state will be preserved for as long as we need.
 
 ## Data Representation in Persistent Memory
 
-Writing our to-do list to persistent memory is all well and good, but how exactly do we do that? We generally cannot write arbitrarily-defined program variables to disk - we can only store sequences of characters, i.e. bytes. And we must have some consistency so that we can also read the memory that we persist.
+Writing our to-do list to persistent memory is all well and good, but how exactly do we do that? We generally can't write arbitrarily complex Rust types to disk; only explicit sequences of bytes. And we must have some consistency so that we can also read the memory that we persist.
 
-In order to effectively represent our memory in a way that it can be stored on disk, we apply a paradigm called [serialization](https://en.wikipedia.org/wiki/Serialization). Serialization is the process of translating data structures and object state represented in a program into a format that can be stored in disk, transmitted across a network connection, and reconstructed later. This practice is widely applied in many different fields of software engineering; it's useful just about anywhere that multiple components of software need to interface with each other, which is to say, everywhere.
+We apply a paradigm called [serialization](https://en.wikipedia.org/wiki/Serialization) to solve this problem. Serialization is the process of translating data structures and object state represented in a program into a format that can be stored in disk, transmitted across a network connection, and reconstructed later. This practice is widely applied in many different fields of software engineering; it's useful just about anywhere that multiple components of software need to interface with each other, which is to say, everywhere.
 
-At a high level, once we know that the user is finished interacting with the to-do list, e.g. when it is scheduled by the Rust compiler to be freed from memory, we can serialize it and write to disk. Similarly, once we know that the user wants to once again interact with the to-do list, we load it from disk and _deserialize_ it back into the original format.
+Once we know that the user is finished interacting with the to-do list, e.g. when it is scheduled by the Rust compiler to be freed from memory, we can serialize it and write to disk. Similarly, once we know that the user wants to once again interact with the to-do list, we load it from disk and _deserialize_ it back into the original format.
 
 The Rust community provides the [serde-rs](https://serde.rs/) framework, which exposes an API to generically serialize and deserialize Rust data structures. In this part of the tutorial, we make extensive use of this framework to provide a simple API to our frontend that manages a user's to-do list and then saves it to disk when s/he doesn't need it anymore. For more on how serde compares with competitors, [see this aside](Rust-Asides.md#aside-serialization "Wherein we just gloat about Rust being cooler than us.").
 
 ## Setting Up
 
-Fortunately, Cargo takes care of most of this for us; we simply need to specify in the configuration file `Cargo.toml` that the crates `serde-rs` and `serde_json` (we'll be storing our list in [the ubiquitous JSON format](https://en.wikipedia.org/wiki/JSON)) needs to be available at build-time; it takes care of the actual downloading on our behalf.
+Fortunately, Cargo takes care of most of this for us. We simply need to specify in our `Cargo.toml` that the crates `serde-rs` and `serde_json` (we'll be using [the ubiquitous JSON format](https://en.wikipedia.org/wiki/JSON)) needs to be available at build-time; Cargo takes care of the rest on our behalf.
 
-The configuration used by the maintainer(s) is [supplied in the source repository](https://github.com/hariamoor/todo-cli/blob/c05ab448365495f25a5f9b1eede81622a8d2d2a0/Cargo.toml#L9-L13).
+The configuration used by the maintainers is [supplied in the source repository](https://github.com/hariamoor/todo-cli/blob/c05ab448365495f25a5f9b1eede81622a8d2d2a0/Cargo.toml#L9-L13).
 
 ## Step 1: Define Appropriate Data Types
 
@@ -39,9 +39,11 @@ pub enum Instruction {
 }
 ```
 
-However, we must first ask ourselves; when and why did we assume that each task would be stored as a string? It would indeed be convenient if that's all we needed to store, but what if we wanted to also store a due date at some point in the future? What if we wanted to expand our definition of what a task in our to-do list looks like?
+<!-- However, we must first ask ourselves; when and why did we assume that each task would be stored as a string? It would indeed be convenient if that's all we needed to store, but what if we wanted to also store a due date at some point in the future? What if we wanted to expand our definition of what a task in our to-do list looks like? -->
 
-In software, rapidly changing requirements like these are all too common. Thus, we would like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this exact use case easily and idiomatically. We add a _parametrized generic type_ as follows:
+We first ask ourselves: why does our identifier _have to_ be a string? Why not a `struct`? Why not an arbitrary type, as long as you can serialize it and print it to the console?
+
+In software, rapidly changing requirements are all too common. In general, we'd like to make code as _generic_ and _extensible_ as possible. Fortunately, Rust is built to support this use case idiomatically. We add a _parametriized generic type_ as follows:
 
 ```rust
 pub enum Instruction<T> {
@@ -52,7 +54,10 @@ pub enum Instruction<T> {
 }
 ```
 
-This allows us to relax our backend-level assumption that the frontend will always represent tasks with the `String` type! We also add a macro using the [_derive_ attribute](https://doc.rust-lang.org/stable/rust-by-example/trait/derive.html) to tell the Rust compiler to auto-generate code that allows this type to interface with `serde-rs` and output debug information where necessary as follows:
+Now, our _identifier_ type can effectively be whatever we want! We also add a macro using the [_derive_ attribute](https://doc.rust-lang.org/stable/rust-by-example/trait/derive.html) to tell the compiler to auto-generate code that:
+
+1. Allows this type to interface with `serde-rs`
+2. Output debug information where necessary
 
 ```rust
 #[derive(Serialize, Deserialize, Debug)]
@@ -77,12 +82,11 @@ where
 }
 ```
 
-Of course, this has to be similarly compatible with `serde-rs`. Furthermore, since we'll be serializaing and displaying (printing to memory) our generic type `T` later, we must ensure that it implements the `Serialize` and `Display `traits; otherwise, the Rust compiler won't know what we want when we ask it to do these things.
-
+Since we'll be serializaing and displaying (printing to memory) our generic type `T` later, it must implement the `Serialize` and `Display `traits. Otherwise, the compiler won't know what we want when we ask it to do these things.
 
 ## Step 2: Implement core logic
 
-This will be the core logic of the application. We couple two functions, `new` and `run`, with our `ToDoList<T>`; the former will return a new instance of `ToDoList`, given the user's name, and the latter will perform the required operation.
+This will be the core logic of the application. We couple two functions, `new` and `run`, with our `ToDoList<T>`. The former will return a new instance of `ToDoList` and the latter will perform the required operation.
 
 `new` is a very simply-defined function (you have to put this in the body of an `impl<T> ToDoList<T> {}`):
 
@@ -95,7 +99,7 @@ pub fn new(name: String) -> ToDoList<T> {
 }
 ```
 
-Much less trivial is the `run` function. Here, we print the to-do list using the [prettytable-rs](https://docs.rs/prettytable-rs/0.8.0/prettytable/index.html) crate. Below is an example of the desired output, which represents the to-do list in a tabular format:
+Much less trivial is the `run` function. Here, we print the to-do list using the [prettytable-rs](https://docs.rs/prettytable-rs/0.8.0/prettytable/index.html) crate. Below is an example of the desired output.
 
 ```
 hamoor's To-Do List:
@@ -144,7 +148,7 @@ pub fn run(&mut self, inst: Instruction<T>) {
 
 Note that we expect user input of indices to be in terms of the presented format, i.e. with indexing starting at 1; this is why we subtract 1 from the same before applying it to the underlying vector type `tasks`.
 
-Finally, we implement the `Drop` trait for `ToDoList<T>`. The `Drop` trait implements a single function, `drop`, which specifies the appropriate way to destroy a `struct` (see the [documentation on the Drop trait](https://doc.rust-lang.org/std/ops/trait.Drop.html) for additional information). We apply it here so that our `ToDoList` serializes itself to a JSON file upon deallocation:
+Finally, we implement the `Drop` trait for `ToDoList<T>`. The `Drop` trait implements a single function, `drop`, which specifies the appropriate way to destroy a `struct` (see the [pertinent documentation ](https://doc.rust-lang.org/std/ops/trait.Drop.html)). We apply it here so that our `ToDoList` serializes itself to a JSON file upon deallocation:
 
 ```rust
 fn drop(&mut self) {
@@ -160,11 +164,11 @@ ANOTHER BONUS: In [our source code](../src/api.rs), we provide an automated test
 
 ## Step 3: Providing a User-Interface
 
-On completion of Step 2, we find ourselvses with a fully-functional to-do list application. The final step is to write a `main` function, which provides an entry-point to run the application with, i.e. using the shell command `cargo run -- <subcommand> <args>`.
+We now have a fully-functional to-do list app! The final step is to write a `main` function, which provides an entry-point to our application. We can call it with the shell command `cargo run -- <subcommand> <args>`.
 
-Here, our `main` function simply checks to see if there is an existing to-do list. If so, it loads it from disk and performs the required operation on it; otherwise, it creates a new to-do list. Next, it calls the `parse()` function defined in Week 1 to parse user input and return in the appropriate format.
+Our `main` function first checks to see if there is an existing to-do list. If so, it loads it from disk and performs the required operation on it; otherwise, it creates a new to-do list.
 
-In either case, it uses the environment variable `$USER` to distinguish the user's name; how might we make this configurable in the future?
+In either case, it uses the environment variable `$USER` to distinguish the user's name: how might we make this configurable in the future?
 
 ```rust
 fn main() -> Result<(), Box<dyn Error>> {
@@ -195,10 +199,10 @@ Congrats! We've now built a functional to-do list CLI application in Rust!
 
 How can we make this even more awesome than it is now? Some ideas for future development:
 
-1. We currently represent each task as a string, but in reality, all we need is for it to be serializable via the `Serialize` trait provided by `serde-rs`, and to be able to display it via the `Display` trait provided in the standard library. Extend this to store additional information about tasks: Deadlines? Partners? Associated notes? The possibilities are endless!
+1. We currently represent our identifiers as strings, but all we need is a generic type that implements the `Serialize` and `Display` traits. Extend the identifier type to store additional information about tasks: Deadlines? Partners? Associated notes? The possibilities are endless!
 
-2. Currently, we store our to-do list in a flat JSON file: What if it got too big to sustainably maintain that? What if the user wants their information stored in some more secure format? What if the user wants to sync it with other applications? Can we extend our persistent representation of our to-do list to support some of these requests?
+2. Currently, we store our to-do list in a flat JSON file: What if it got too big for that? What if the user wants his information stored in a different format? What if he wants to sync it with other applications? Can we extend this persistent representation of our state to support some of these requests?
 
-3. How can we distribute our to-do list to potential users via the Rust ecosystem? Naturally, we would use Cargo as our build system; where would we need to make it available, so that potential users could have what they need with the simple shell command `cargo install todo-cli`?
+3. How can we distribute our to-do list to potential users via the Rust ecosystem? Naturally, the end user would install it via Cargo; where would we need to make it available for them to do this?
 
 These are some potential future considerations you might explore in your continuing journey as a Rustacean. Good luck!

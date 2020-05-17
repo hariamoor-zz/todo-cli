@@ -90,11 +90,11 @@ We provide the following (running) list of Rust resources:
 
 -   [Maintainer David Tonlay\'s Rust FAQ](https:github.com/dtonlay/rust-faq)
 -   Books:
-    -   [Rust book](https:doc.rust-lang.org/book/)
-    -   Rust [async book](https:www.rust-lang.org/learn/get-started)
+    -   [Rust book](https://doc.rust-lang.org/book/)
+    -   Rust [async book](https://www.rust-lang.org/learn/get-started)
         (for concurrent programming)
-    -   The [Rust subreddit](https:www.reddit.com/r/rust/)
-    -   [r4cppp tutorial](https:github.com/nrc/r4cppp) (recommended only
+    -   The [Rust subreddit](https://www.reddit.com/r/rust/)
+    -   [r4cppp tutorial](https://github.com/nrc/r4cppp) (recommended only
         with sufficient C/C++ background)
     -   [A Gentle Introduction to Rust](https:stevedonovan.github.io/rust-gentle-intro/)
 

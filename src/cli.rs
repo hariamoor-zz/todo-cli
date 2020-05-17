@@ -7,7 +7,7 @@ use simple_error::bail;
 pub fn parse() -> Result<Instruction<String>, Box<dyn Error>> {
     let matches = clap_app!(todo_cli =>
         (version: "0.1")
-        (author: "USACS at Rutgers Uo list CLI in Rust")
+        (author: "USACS at Rutgers University")
         (@subcommand print =>
             (about: "Print out all values stored in CLI")
         )
